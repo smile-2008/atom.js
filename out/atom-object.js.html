@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/atom-object.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules/atom-object.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author shadow
+ * @filename
+ */
+
+/** @class Object */
+
+var MODULE = {
+
+    manifest: {
+        name: "Object"
+    },
+
+    scope: {
+
+        entry: function() {
+
+        },
+
+        alias: {
+            "flip": "flipObject",
+            "analyze": "analyzeObject",
+
+            "compose": "composeObject"
+        },
+        handyAlias: {
+            "cmap": "createObject"
+        }
+    },
+
+    members: {
+
+        /** @memberof Object
+         *  @desc clone an object
+         *  @param object the input object
+         *  @param maxDeep a integer indicate max object layer
+         *  @param curDeep a interger indicate current layer, default 1
+         *  @return a clone object*/
+        clone: function(object, maxDeep, curDeep) {
+
+            // set default arguments
+            curDeep = curDeep || 1;
+            maxDeep = maxDeep || 1;
+
+            // if curDeep large than maxDeep , return object
+            if(curDeep > maxDeep) {
+                return object;
+            }
+
+            var cloneObject;
+            // create new object
+
+            cloneObject = new Object();
+
+            for(var key in object) {
+
+                var curValue = object[key];
+
+                var valueType = typeof(curValue);
+
+                // if current value is an object, recall clone()
+                if(valueType == "object") {
+                    cloneObject[key] = clone(curValue);
+                }
+                else {
+                    // copy if current value not an object
+                    cloneObject[key] = curVal;
+                }
+            }
+
+            return cloneObject;
+        },
+
+        /** @memberof Object
+         *  @desc flip an object
+         *  @param object tha input object
+         *  @param cloneMode a bool value indicate the flip operation on input object or create new object
+         *  @return the fliped object*/
+
+        flipObject: function(object, cloneMode) {
+
+            var resultObject;
+
+            // set flip mode
+            if(cloneMode == true) {
+                resultObject = new Object();
+            }
+            else {
+                resultObject = object;
+            }
+
+            // flip every member
+
+            for(var key in resultObject) {
+
+                var value = resultObject[key];
+
+                // set value
+                resultObject[value] = key;
+
+                // delete value
+                delete resultObject[key];
+            }
+
+            return resultObject;
+        },
+
+        /** @memberof Object
+         *  @desc analyze an object to a string
+         *  @param object the input object
+         *  @param options a options for analyze
+         *  @return a string combined form object*/
+
+        analyzeObject: function(object, options) {
+
+            var resultString;
+
+            // set default options
+            options = options || {};
+
+            var delimiter = options.delimiter || "&amp;";
+
+            var delimiter2 = options.delimiter2 || "=";
+
+            var encodeMode = true;
+
+            if(options.encode == undefined) {
+                encodeMode = true;
+            }
+
+            // sometime set prefix
+            var prefix = options.prefix || "";
+
+            // create an array
+            var members = new Array();
+
+            // iterate each object
+
+            for(var key in object) {
+
+                var value = object[key];
+
+                // if on encode mode, encode value use encodeURIComponent() api
+                if(encodeMode == true) {
+                    value = window.encodeURIComponent(value);
+                }
+
+                var curStr = key + delimiter2 + value;
+
+                // push current string to array
+
+                members.push(curStr);
+            }
+
+            // join array with delimiter
+
+            resultString = members.join(delimiter);
+
+            return resultString;;
+        },
+
+
+
+        /** @memberof Object
+         *  @desc create an object and fill it
+         *  @param source the input source, string, array or object
+         *  @param fillMode default value use fill in return map object, there are tow special word
+         *  'key' and 'index', if set 'key', the value is equal key in map, if 'index', the value is an integer
+         *  by ascending, start with 0
+         *  @param startIndex use 'index' mode, default 0
+         *  @return an object*/
+
+        createMap: function(source, fillMode, startIndex) {
+
+            var mapObject = new Object();
+
+            // set default fill mode
+
+            if(fillMode == undefined) {
+                fillMode = true;
+            }
+
+            startIndex = startIndex || 0;
+
+            var sourceType = typeof(source);
+
+            if(sourceType == "string") {
+                // split string into array use ',' delimiter
+                source = source.split(",");
+            }
+
+            var index = 0;
+            var keyName, value;
+
+            // use array's every value as keyName
+            if(source instanceof Array) {
+
+                for(;index &lt; source.length; index++) {
+
+                    keyName = source[index];
+
+                    // get value from inner function
+                    value = $inner_getValue();
+
+                    mapObject[keyName] = value;
+                }
+            }
+            else if(sourceType == "object") {
+
+                // the map object's key count equal source object
+                for(keyName in source) {
+
+                    value = $inner_getValue();
+
+                    mapObject[keyName] = value;
+                }
+            }
+
+            return mapObject;
+            /** inner
+             *  desc return a value
+             */
+            function $inner_getValue() {
+
+                var returnValue;
+
+                // open three branch
+                if(fillMode == "key") {
+                    returnValue = keyName;
+                }
+                else if(fillMode == "index") {
+                    returnValue = index + startIndex;
+                }
+                else {
+                    returnValue = fillMode;
+                }
+
+                return returnValue;
+            }
+        }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Array.html">Array</a></li><li><a href="AtomCreator.html">AtomCreator</a></li><li><a href="AtomKeeper.html">AtomKeeper</a></li><li><a href="AtomLoader.html">AtomLoader</a></li><li><a href="AtomModule.html">AtomModule</a></li><li><a href="Browser.html">Browser</a></li><li><a href="Color.html">Color</a></li><li><a href="CORE.html">CORE</a></li><li><a href="CSS.html">CSS</a></li><li><a href="Data.html">Data</a></li><li><a href="Emitter.html">Emitter</a></li><li><a href="Function.html">Function</a></li><li><a href="HtmlCreator.html">HtmlCreator</a></li><li><a href="IterateController.html">IterateController</a></li><li><a href="Iterator.html">Iterator</a></li><li><a href="JSON.html">JSON</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="KeyboardListener.html">KeyboardListener</a></li><li><a href="Math.html">Math</a></li><li><a href="MODULE.Class.CombiKeys.html">CombiKeys</a></li><li><a href="NameSpace.html">NameSpace</a></li><li><a href="Number.html">Number</a></li><li><a href="Object.html">Object</a></li><li><a href="Question.html">Question</a></li><li><a href="global.html#Random">Random</a></li><li><a href="RUNTIME.html">RUNTIME</a></li><li><a href="Script.html">Script</a></li><li><a href="Seed.html">Seed</a></li><li><a href="String.html">String</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MODULE">MODULE</a></li><li><a href="global.html#pit">pit</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Tue Feb 18 2014 12:29:42 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

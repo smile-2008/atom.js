@@ -1,0 +1,24 @@
+/* 2/7/14 */
+
+/* like blue ? */
+
+h1 {
+	background: aqua;
+	color: white;
+
+	font-size: 48px;
+	text-align: center;
+	font-weight: normal;
+	font-family: 'impact';
+}
+
+/* like green? */
+p {
+	background: lawngreen;
+	min-height: 320px;
+
+	padding: 48px 0px 0px 48px;
+
+	font-family: 'verdana';
+	font-size: 2em;
+}

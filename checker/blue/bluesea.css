@@ -1,0 +1,41 @@
+/**
+* @author: shadow
+* @filename: 
+*/
+
+.module-container {
+	border: dotted 2px silver;	
+	padding: 24px;
+
+	text-align: center;
+}
+
+.module-square {
+	display: inline-block;
+
+	width: 160px;
+	height: 160px;
+	
+	background: red;
+
+	margin: 16px;
+
+	#-webkit-animation: rotate2 10s;
+}
+
+/* do you love rotate ? */
+
+@-webkit-keyframes rotate2 {
+	0% {
+		-webkit-transform: rotateZ(0deg);
+	}
+	30% {
+		-webkit-transform: rotateZ(30deg);
+	}
+	60% {
+		-webkit-transform: rotateZ(-30deg);
+	}
+	100% {
+		-webkit-transform: rotateZ(0deg);
+	}
+}

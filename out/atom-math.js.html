@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/atom-math.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules/atom-math.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author shadow
+ * @filename
+ */
+
+/** @class Math */
+var MODULE = {
+
+    manifest: {
+        name: "Math",
+        author: "shadow",
+
+        appendence: ["random"]
+    },
+
+    scope: {
+        onInit: function() {
+
+            // expose Math API
+            var MathApi = ["round", "ceil", "floor", "random", "sin", "cos", "tan"];
+
+            $Namespace.addGlobal(Math, MathApi);
+        },
+        entry: function() {
+
+        },
+
+        alias: {
+            "randInt": "randomInteger",
+            "randNum": "randomFloat",
+
+            "randIntR": "randomIntegerRanges",
+            "randNumR": "randomFloatRanges",
+
+            "limit": "limitNumber",
+            "limitNum": "limitNumberRange",
+            "limitChar": "limitCharacterRange",
+
+            "range": "getRangeList"
+        },
+
+        handyAlias: {
+
+            "rint": "randomInteger",
+            "rnum": "randomFloat",
+
+            "rintR": "randomIntegerRanges",
+            "rnumR": "randomFloatRanges",
+
+            "lt": "largeThan",
+            "st": "smallThan",
+
+            "nlt": "notLargeThan",
+            "nst": "notSmallThan",
+
+            "neq": "notEqual"
+        }
+    },
+
+    members: {
+        /** @memberof Math
+         *  @desc generate a random integer in a range
+         *  @param maxInteger max integer in range
+         *  @param minInteger min integer in range
+         *  @return a random integer*/
+        randomInteger: function(maxInteger, minInteger) {
+
+            maxInteger = maxInteger || 100;
+            minInteger = minInteger || 0;
+
+            var resultInteger;
+
+            // use Math api, round() and random()
+
+            resultInteger = Math.round(Math.random() * (maxInteger - minInteger) + minInteger);
+
+            return resultInteger;
+        },
+
+        /** @memberof Math
+         *  @desc generate a random float number in a range
+         *  @param maxFloat the max float number in range
+         *  @param minFloat the min float number in range
+         *  @param precision the pricision of the result float number
+         *  @return a random float number*/
+
+        randomFloat: function(maxFloat, minFloat, precision) {
+
+            precision = precision || 2;
+
+            minFloat = minFloat || 0;
+            maxFloat = maxFloat || 1;
+
+            // Math.random() generate a number between 0 - 0.999..
+            var resultFloat = Math.random() * (maxFloat - minFloat) + minFloat;
+
+            return resultFloat.toFixed(precision);
+        },
+
+        /** @memberof Math
+         *  @desc generate a random integer in multiple ranges
+         *  @return a random integer */
+
+        randomIntegerRanges: function() {
+
+            var argumentLength = arguments.length;
+
+            // get a random range index
+
+            var rangeIndex = $Math.randomInteger(argumentLength - 1, 0);
+
+            var range = arguments[rangeIndex] || {};
+
+            // set max and min integer
+            var maxInteger = range[0];
+            var minInteger = range[1];
+
+            // get a random integer
+            var resultInteger = $Math.randomInteger(maxInteger, minInteger);
+
+            return resultInteger;
+        },
+
+        /** @memberof Math
+         *  @desc generate a random float number in multiple ranges
+         *  @return a random float number */
+
+        randomFloatRanges: function() {
+
+            var rangeList = arguments;
+
+            var rangeIndex = $Math.randomInteger(rangeList.length - 1);
+
+            var range = rangeList[rangeIndex] || {};
+
+            // generate a random float number
+            var resultFloat = $Math.randomFloat(range[0], range[1], range[2]);
+
+            return resultFloat;
+        },
+
+        /** @memberof Math
+         *  @desc limit a input number in a range
+         *  @param number the input number
+         *  @param minNumber the min number in range
+         *  @param maxNumber the max number in range
+         *  @param defaultMax indicate if number out of range, the default value whether maxNumber
+         *  @return a number*/
+        limitNumberRange: function(number, minNumber, maxNumber, defaultMax) {
+
+            if( (number &lt; minNumber) &amp;&amp; (number > maxNumber)) {
+
+                // out of range, check defaultMax
+                if(defaultMax == true) {
+                    number = maxNumber;
+                }
+                else {
+                    number = minNumber;
+                }
+            }
+
+            return number;
+        },
+
+        /** @memberof Math
+         *  @desc limit a input character in range
+         *  @param character the input character
+         *  @param maxCharacter the max character in range
+         *  @param minCharacter the min charcter in range,
+         *  @param defaultMax if true, when input character out of range, set character is maxCharacter, else is minCharacter
+         *  @return a character*/
+
+        limitCharacterRange: function(character, minCharacter, maxCharacter, defaultMax) {
+
+            var charCode, maxCode, minCode;
+
+            // get ascii code for math compare
+            charCode = character.charCodeAt(0);
+
+            minCode = minCharacter.charCodeAt(0);
+            maxCode = maxCharacter.charCodeAt(0);
+
+            // check whether out of range
+            if( (charCode &lt; minCode) &amp;&amp; (charCode > maxCode)) {
+
+                if(defaultMax == true) {
+                    character = maxCharacter;
+                }
+                else {
+                    character = minCharacter;
+                }
+            }
+
+            return character;
+        },
+
+        /** @memberof Math
+         *  @desc limit a number or character in a range
+         *  @param input the input number or character
+         *  @param min the min in range, number of character
+         *  @param max the max in range, number or character
+         *  @return a number or a character*/
+
+        limitRange: function(input, min, max, defaultMax) {
+
+            var result;
+
+            if(typeof(input) == "string") {
+                result = $Math.limitCharacterRange.apply(null, arguments);
+            }
+            else {
+                result = $Math.limitNumberRange.apply(null, arguments);
+            }
+
+            return result;
+        },
+
+        /** @memberof Math
+         *  @desc check input value whether in a range
+         *  @param input a number or a character
+         *  @param maxValue the max value of range
+         *  @param minValue the min value of range
+         *  @return ture or false*/
+
+        inRange: function(input, maxValue, minValue) {
+
+            var checkResult = false;
+
+            if( (input &lt;= maxValue) &amp;&amp; (input >= minValue)) {
+                checkResult = true;
+            }
+
+            return checkResult;
+        },
+
+        /** @memberof Math
+         *  @param input the input number or character
+         *  @return this*/
+
+        inRanges: function(input) {
+
+            var checkResult = true;
+
+            // iterate arguments
+            for(var iRange = 1; iRange &lt; arguments.length; iRange++) {
+
+                var curRange = arguments[iRange];
+
+                if($Math.inRange(input, curRange) == false) {
+                    checkResult = false;
+                    break;
+                }
+            }
+
+            return checkResult;
+        },
+          /** @memberof Math
+         *  @desc limit a number or a character by max value
+         *  @param input the input number or character
+         *  @param compareValue the compare value
+         *  @return a number or a character*/
+
+        notLargeThan: function(input, compareValue) {
+
+            if(input > compareValue) {
+                input = compareValue;
+            }
+
+            return input;
+        },
+
+        /** @memberof Math
+         *  @desc limit a number or a character by min value
+         *  @param input the input or character
+         *  @param compareValue the compare value
+         *  @return a number or a character*/
+
+        notSmallThan: function(input, compareValue) {
+
+            if(input &lt; compareValue) {
+                input = compareValue;
+            }
+
+            return input;
+        },
+
+        /** @memberof Math
+         *  @desc limit input value large than a value
+         *  @param input the input value
+         *  @param minValue a value use as a minimize
+         *  @return a value*/
+
+        largeThan: function(input, minValue) {
+
+            if(input &lt;= minValue) {
+                input = minValue + 0.000000001;
+            }
+
+            return input;
+        },
+
+        /** @memberof Math
+         *  @desc limit input value small than a value
+         *  @param input the input value
+         *  @param maxValue a value use as a maximize
+         *  @return a compared value*/
+
+        smallThan: function(input, maxValue) {
+
+            if(input >= maxValue) {
+                input = maxValue - 0.000000001;
+            }
+
+            return input;
+        },
+
+        /** @memberof Math
+         *  @desc limit a input value not equal a compare value
+         *  @param input the input value
+         *  @param equalValue a value use for compare
+         *  @param defaultValue default value if compared result is equal
+         *  @return a compared value*/
+
+        notEqualThan: function(input, compareValue, defaultValue) {
+
+            if(input === compareValue) {
+                input = defaultValue;
+            }
+
+            return input;
+        },
+
+        /** @memberof Math
+         *  @desc generate a value array in range
+         *  @param startValue the start value in range
+         *  @param endValue the end value in range
+         *  @param step the step value
+         *  @return the value array */
+
+        getRangeList: function(startValue, endValue, step) {
+
+            step = step || 1;
+
+            var isCharacter = (typeof(startValue) == "string");
+
+            if(isCharacter == true) {
+                startValue = startValue.charCodeAt(0);
+                endValue = endValue.charCodeAt(0);
+            }
+
+            var listLength = Math.abs((startValue - endValue) / step) + 1;
+
+            var isReversed = false;
+
+            // if condition true, reverse step
+            if(startValue > endValue) {
+                step = - step;
+
+                isReversed = true;
+            }
+
+            var valueArray = new Array();
+
+            // generate every value
+
+            for(var index = 0; index &lt; listLength; index++) {
+
+                var curValue = startValue + step*index;
+
+                if(isReversed == true &amp;&amp; (curValue &lt; endValue)) {
+                    continue;
+                }
+                else if((isReversed == false) &amp;&amp; (curValue > endValue)) {
+                    continue;
+                }
+
+                if(isCharacter == true) {
+                    curValue = String.fromCharCode(curValue);
+                }
+
+                // push value to array
+                valueArray.push(curValue);
+            }
+
+            return valueArray;
+        }
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Array.html">Array</a></li><li><a href="AtomCreator.html">AtomCreator</a></li><li><a href="AtomKeeper.html">AtomKeeper</a></li><li><a href="AtomLoader.html">AtomLoader</a></li><li><a href="AtomModule.html">AtomModule</a></li><li><a href="Browser.html">Browser</a></li><li><a href="Color.html">Color</a></li><li><a href="CORE.html">CORE</a></li><li><a href="CSS.html">CSS</a></li><li><a href="Data.html">Data</a></li><li><a href="Emitter.html">Emitter</a></li><li><a href="Function.html">Function</a></li><li><a href="HtmlCreator.html">HtmlCreator</a></li><li><a href="IterateController.html">IterateController</a></li><li><a href="Iterator.html">Iterator</a></li><li><a href="JSON.html">JSON</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="KeyboardListener.html">KeyboardListener</a></li><li><a href="Math.html">Math</a></li><li><a href="MODULE.Class.CombiKeys.html">CombiKeys</a></li><li><a href="NameSpace.html">NameSpace</a></li><li><a href="Number.html">Number</a></li><li><a href="Object.html">Object</a></li><li><a href="Question.html">Question</a></li><li><a href="global.html#Random">Random</a></li><li><a href="RUNTIME.html">RUNTIME</a></li><li><a href="Script.html">Script</a></li><li><a href="Seed.html">Seed</a></li><li><a href="String.html">String</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MODULE">MODULE</a></li><li><a href="global.html#pit">pit</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Tue Feb 18 2014 12:29:42 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

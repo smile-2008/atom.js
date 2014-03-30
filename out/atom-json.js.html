@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/atom-json.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules/atom-json.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author shadow
+ * @filename
+ */
+
+/** @class JSON */
+var MODULE =
+{
+    manifest: {
+        name: "JSON"
+    },
+
+    scope: {
+        onInit: function() {
+
+            // expose jsonParser to window
+
+            window.JSONParser = $keeper.component.JSONParser;
+
+            if($_handyMode == true) {
+                window.jsoner = $keeper.component.JSONParser;
+            }
+        },
+        entry: function() {
+
+        },
+
+        alias: {
+            "encode": "encodeJSON",
+            "decode": "decodeJSON"
+        }
+    },
+
+    members: {
+
+        encodeJSON: function(object) {
+
+            // get component
+            var JSONParser = $keeper.component.JSONParser;
+
+            var encodeResult;
+
+            // call component api
+            encodeResult = JSONParser.encode(object);
+
+            return encodeResult;
+        },
+
+        decodeJSON: function(string) {
+
+            // get parser component
+            var JSONParser = $keeper.component.JSONParser;
+
+            var decodeResult;
+
+            // use JSONParser.decode()
+            decodeResult = JSONParser.decode(string);
+
+            return decodeResult;
+        }
+    },
+    keep: {
+
+        component: {
+            JSONParser:
+            {
+                useHasOwn : ({}.hasOwnProperty ? true : false),
+
+                pad : function(n) {
+                    return n &lt; 10 ? "0" + n : n;
+                },
+
+                m : {
+                    "\b": '\\b',
+                    "\t": '\\t',
+                    "\n": '\\n',
+                    "\f": '\\f',
+                    "\r": '\\r',
+                    '"' : '\\"',
+                    "\\": '\\\\'
+                },
+                encodeString : function(s){
+                    if (/["\\\x00-\x1f]/.test(s)) {
+
+                        return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
+
+                            var c = $keeper.component.JSONParser.m[b];
+                            if(c){
+                                return c;
+                            }
+
+                            c = b.charCodeAt();
+
+                            return "\\u00" +
+                                Math.floor(c / 16).toString(16) +
+                                (c % 16).toString(16);
+                        }) + '"';
+                    }
+
+                    return '"' + s + '"';
+                },
+
+                encodeArray : function(o){
+                    var a = ["["], b, i, l = o.length, v;
+
+                    for (i = 0; i &lt; l; i += 1) {
+                        v = o[i];
+
+                        switch (typeof v) {
+                            case "undefined":
+                            case "function":
+                            case "unknown":
+
+                                break;
+
+                            default:
+
+                                if (b) {
+                                    a.push(',');
+                                }
+
+                                a.push(v === null ? "null" : this.encode(v));
+                                b = true;
+                        }
+                    }
+
+                    a.push("]");
+
+                    return a.join("");
+                },
+
+                encodeDate : function(o){
+
+                    return '"' + o.getFullYear() + "-" +
+
+                        pad(o.getMonth() + 1) + "-" +
+                        pad(o.getDate()) + "T" +
+                        pad(o.getHours()) + ":" +
+                        pad(o.getMinutes()) + ":" +
+                        pad(o.getSeconds()) + '"';
+                },
+
+                encode : function(o) {
+
+                    if(typeof o == "undefined" || o === null){
+                        return "null";
+                    }
+                    else if(o instanceof Array){
+                        return this.encodeArray(o);
+                    }
+                    else if(o instanceof Date){
+                        return this.encodeDate(o);
+                    }
+                    else if(typeof o == "string"){
+                        return this.encodeString(o);
+                    }
+                    else if(typeof o == "number"){
+                        return isFinite(o) ? String(o) : "null";
+                    }
+                    else if(typeof o == "boolean"){
+                        return String(o);
+                    }
+                    else {
+                        var self = this;
+                        var a = ["{"], b, i, v;
+
+                        for (i in o) {
+                            if(!this.useHasOwn || o.hasOwnProperty(i)) {
+                                v = o[i];
+                                switch (typeof v) {
+                                    case "undefined":
+                                    case "function":
+                                    case "unknown":
+                                        break;
+                                    default:
+
+                                        if(b){
+                                            a.push(',');
+                                        }
+
+                                        a.push(self.encode(i), ":",
+                                            v === null ? "null" : self.encode(v));
+                                        b = true;
+                                }
+                            }
+                        }
+
+                        a.push("}");
+                        return a.join("");
+                    }
+                },
+
+                decode : function(json){
+                    return eval("(" + json + ')');
+                }
+            }
+        }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Array.html">Array</a></li><li><a href="AtomCreator.html">AtomCreator</a></li><li><a href="AtomKeeper.html">AtomKeeper</a></li><li><a href="AtomLoader.html">AtomLoader</a></li><li><a href="AtomModule.html">AtomModule</a></li><li><a href="Browser.html">Browser</a></li><li><a href="Color.html">Color</a></li><li><a href="CORE.html">CORE</a></li><li><a href="CSS.html">CSS</a></li><li><a href="Data.html">Data</a></li><li><a href="Emitter.html">Emitter</a></li><li><a href="Function.html">Function</a></li><li><a href="HtmlCreator.html">HtmlCreator</a></li><li><a href="IterateController.html">IterateController</a></li><li><a href="Iterator.html">Iterator</a></li><li><a href="JSON.html">JSON</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="KeyboardListener.html">KeyboardListener</a></li><li><a href="Math.html">Math</a></li><li><a href="MODULE.Class.CombiKeys.html">CombiKeys</a></li><li><a href="NameSpace.html">NameSpace</a></li><li><a href="Number.html">Number</a></li><li><a href="Object.html">Object</a></li><li><a href="Question.html">Question</a></li><li><a href="global.html#Random">Random</a></li><li><a href="RUNTIME.html">RUNTIME</a></li><li><a href="Script.html">Script</a></li><li><a href="Seed.html">Seed</a></li><li><a href="String.html">String</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MODULE">MODULE</a></li><li><a href="global.html#pit">pit</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Tue Feb 18 2014 12:29:42 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

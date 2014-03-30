@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/atom-browser.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules/atom-browser.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author shadow
+ * @filename
+ */
+
+/** @class Browser */
+var MODULE = {
+
+    manifest: {
+        name: "Browser",
+        author: "shadow"
+    },
+
+    scope: {
+        entry: function() {
+
+        }
+    },
+
+    members: {
+
+        /** @memberof Browser
+         *  @desc determine current browser is webkit core
+         *  @return true or false*/
+        isWebkit: function() {
+
+            var userAgent = navigator.userAgent;
+
+            var webkitTest = /webkit/i;
+
+            return webkitTest.test(userAgent);
+        },
+        /** @memberof Browser
+         *  @desc determine whether current browser is chrome
+         *  @return true or false */
+
+        isChrome: function() {
+
+            var userAgent;
+
+            userAgent = navigator.userAgent;
+
+            // create a regexp
+            var testRegExp = /CHROME/i;
+
+            return testRegExp.test(userAgent);
+        },
+
+        /** @memberof Browser
+         *  @desc determine whether current browser is ie
+         *  @return true or false*/
+
+        isIE: function() {
+
+            var appName = navigator.appName;
+
+            // create a test regexp
+            var testExp = /Microsoft/i;
+
+            return testExp.test(appName);
+        },
+
+        /** @memberof Browser
+         *  @desc add browser prefix to some css style name
+         *  @param styleName thi input style name
+         *  @return the modified name*/
+
+        modifyStyleName: function(styleName) {
+
+            var testRegexp;
+
+            // get css special list
+            var cssList = $keeper.list.specialCSSNames;
+
+            if(cssList.indexOf(styleName) !== -1) {
+
+                if($Browser.isWebkit() == true) {
+
+                    testRegexp = /^(|-)webkit/i;
+
+                    if(testRegexp.test(styleName) == false) {
+
+                        // join css name start with webkit
+
+                        styleName = "webkit" + styleName[0].toUpperCase() + styleName.slice(1);
+                    }
+                }
+            }
+
+            // if the style name has - symbol, convert it to style property name
+            if(styleName.indexOf("-") !== -1) {
+
+                // remove - in the start position
+                styleName = styleName.replace(/^-*/, "");
+
+                var wordList = styleName.split("-");
+
+                styleName = "";
+
+                for(var iWord = 0; iWord &lt; wordList.length; iWord++) {
+
+                    var curWord = wordList[iWord];
+
+                    if(iWord == 0) {
+
+                        // the first word always lowercase
+                        styleName += curWord.toLowerCase();
+                    }
+                    else {
+                        curWord = curWord.toLowerCase();
+
+                        // follow words't initial charctor is uppercase
+                        styleName += curWord[0].toUpperCase() + curWord.slice(1);
+                    }
+                }
+            }
+
+            return styleName;
+        }
+    },
+
+    keep: {
+        list: {
+            specialCSSNames: ["animation", "transform", "transition"]
+        }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Array.html">Array</a></li><li><a href="AtomCreator.html">AtomCreator</a></li><li><a href="AtomKeeper.html">AtomKeeper</a></li><li><a href="AtomLoader.html">AtomLoader</a></li><li><a href="AtomModule.html">AtomModule</a></li><li><a href="Browser.html">Browser</a></li><li><a href="Color.html">Color</a></li><li><a href="CORE.html">CORE</a></li><li><a href="CSS.html">CSS</a></li><li><a href="Data.html">Data</a></li><li><a href="Emitter.html">Emitter</a></li><li><a href="Function.html">Function</a></li><li><a href="HtmlCreator.html">HtmlCreator</a></li><li><a href="IterateController.html">IterateController</a></li><li><a href="Iterator.html">Iterator</a></li><li><a href="JSON.html">JSON</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="KeyboardListener.html">KeyboardListener</a></li><li><a href="Math.html">Math</a></li><li><a href="MODULE.Class.CombiKeys.html">CombiKeys</a></li><li><a href="NameSpace.html">NameSpace</a></li><li><a href="Number.html">Number</a></li><li><a href="Object.html">Object</a></li><li><a href="Question.html">Question</a></li><li><a href="global.html#Random">Random</a></li><li><a href="RUNTIME.html">RUNTIME</a></li><li><a href="Script.html">Script</a></li><li><a href="Seed.html">Seed</a></li><li><a href="String.html">String</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MODULE">MODULE</a></li><li><a href="global.html#pit">pit</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Tue Feb 18 2014 12:29:42 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

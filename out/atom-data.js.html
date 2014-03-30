@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules/atom-data.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules/atom-data.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @author shadow
+ * @filename
+ */
+
+/** @class Data */
+var MODULE =
+{
+    manifest: {
+        name: "Data"
+    },
+
+    scope: {
+        entry: function() {
+
+        },
+
+        alias: {
+            "str2int": "stringToInteger",
+            "int2str": "integer2string"
+        },
+
+        handyAlias: {
+            "grab": "grabValue"
+        }
+    },
+
+    members: {
+
+        /** @memberof Data
+         *  @desc convert a string to integer array
+         *  @param data the input data
+         *  @return the result array */
+
+        stringToInteger: function(string) {
+
+            var resultArray = [];
+
+            for(var index = 0; index &lt; string.length; index++) {
+
+                var charCode = string.charCodeAt(index);
+
+                // push to result array
+                resultArray.push(charCode);
+            }
+
+            return resultArray;
+        },
+
+        /** @memberof Data
+         *  @desc use an integer array generate a string
+         *  @param array the input array
+         *  @return the result string*/
+
+        IntegerToString: function(array) {
+
+            var resultString;
+
+            // iterate input array
+            for(var index = 0; index &lt; array.length; index++) {
+
+                var charCode = array[index];
+
+                // append a char to string
+                resultString += String.fromCharCode(charCode);
+            }
+
+            return resultString;
+        },
+
+        /** @memberof Data
+         *  @desc get values use filters from an object
+         *  @param source the input source
+         *  @param filters a filters object, or other
+         *  @param indexMode if indexMode is true, get index instead of value
+         *  @return the result list */
+
+        grabValue: function(source, filters, indexMode) {
+
+            // set default mode is value mode
+            if(indexMode == undefined) {
+                indexMode = false;
+            }
+
+            // check filters
+
+            var filtersType = typeof(filters);
+
+            // there have sevent filter
+            var valueFilter, indexFilter, typeFilter,
+                handleFilter, countFilter, deepFilter, objectFilter;
+
+            // split string into list use comma
+
+            if(filtersType == "string") {
+                filters = filters.split(/,/);
+            }
+
+            if(filters instanceof Array) {
+
+                // set filter use index
+                valueFilter = filters[0];
+                indexFilter = filters[1];
+
+                typeFilter = filters[2];
+                handleFilter = $CORE.makeMethod(filters[3]);
+                countFilter = parseInt(filters[4]);
+
+                deepFilter = parseInt(filters[5]);
+                objectFilter = Boolean(filters[6]);
+            }
+            else if(filtersType == "object") {
+
+                // each filter in the filters
+                indexFilter = filters.index;
+                valueFilter = filters.value;
+                typeFilter = filters.type;
+
+                handleFilter = filters.handle;
+                countFilter = filters.count;
+                deepFilter = filters.deep;
+                objectFilter = filters.object;
+            }
+            else if(filtersType == "function") {
+                handleFilter = filters;
+            }
+            else if(filtersType == "number") {
+                countFilter = filters;
+            }
+
+            // counter
+
+            var counter = 0;
+
+            var resultList = new Array();
+
+            // call $Iterator.each
+
+            $Iterator.eachIterate(source, $inner_GrabCallback, null, deepFilter, null, objectFilter);
+
+            return resultList;
+            /** inner
+             *  desc a grab callback use process every value or index
+             */
+
+            function $inner_GrabCallback(value, index, curDeep, ctrl) {
+
+                // open branch
+                var valueType = typeof(value);
+
+                var isCorrect = false;
+
+                var strValue;
+
+                if(value) {
+                    strValue = value.toString();
+                }
+
+                if(value &amp;&amp; valueFilter &amp;&amp; !strValue.match(valueFilter)) {
+                    // not matched
+                }
+                else if(indexFilter &amp;&amp; ! index.match(indexFilter)) {
+                    // not matched
+                }
+                else if(typeFilter &amp;&amp; (valueType !== typeFilter)) {
+                    // not matched
+                }
+                else if(countFilter &amp;&amp; (countFilter &lt;= counter )) {
+                    // the max count is got
+                    ctrl.stopAll();
+                }
+                else {
+                    isCorrect = true;
+                }
+
+                // if correct, check indexMode isset, if true, save index, or value
+
+                if(isCorrect == true) {
+
+                    if(indexMode == true) {
+                        resultList.push(index);
+                    }
+                    else {
+                        resultList.push(value);
+                    }
+
+                    // increment counter
+                    counter++;
+                }
+
+            }
+        }
+     }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Array.html">Array</a></li><li><a href="AtomCreator.html">AtomCreator</a></li><li><a href="AtomKeeper.html">AtomKeeper</a></li><li><a href="AtomLoader.html">AtomLoader</a></li><li><a href="AtomModule.html">AtomModule</a></li><li><a href="Browser.html">Browser</a></li><li><a href="Color.html">Color</a></li><li><a href="CORE.html">CORE</a></li><li><a href="CSS.html">CSS</a></li><li><a href="Data.html">Data</a></li><li><a href="Emitter.html">Emitter</a></li><li><a href="Function.html">Function</a></li><li><a href="HtmlCreator.html">HtmlCreator</a></li><li><a href="IterateController.html">IterateController</a></li><li><a href="Iterator.html">Iterator</a></li><li><a href="JSON.html">JSON</a></li><li><a href="Keyboard.html">Keyboard</a></li><li><a href="KeyboardListener.html">KeyboardListener</a></li><li><a href="Math.html">Math</a></li><li><a href="MODULE.Class.CombiKeys.html">CombiKeys</a></li><li><a href="NameSpace.html">NameSpace</a></li><li><a href="Number.html">Number</a></li><li><a href="Object.html">Object</a></li><li><a href="Question.html">Question</a></li><li><a href="global.html#Random">Random</a></li><li><a href="RUNTIME.html">RUNTIME</a></li><li><a href="Script.html">Script</a></li><li><a href="Seed.html">Seed</a></li><li><a href="String.html">String</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MODULE">MODULE</a></li><li><a href="global.html#pit">pit</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a> on Tue Feb 18 2014 12:29:42 GMT+0800 (China Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
