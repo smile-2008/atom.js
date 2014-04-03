@@ -6,8 +6,9 @@
 var MODULE =
 {
     options: {
-        extendProto: true, // the value indicate HTMLElement's prototype shoulde be extended
-        addPrototypeAlias: true,
+        enabelEnter: true,
+        extendProto: false, // the value indicate HTMLElement's prototype shoulde be extended
+        addPrototypeAlias: false,
 
         HTMLElementMethodAliasMap: {
             "hasAttr": "hasAttribute",
@@ -19,7 +20,7 @@ var MODULE =
             "nextSib": "nextSibling",
 
             "prevEle": "previousElementSibling",
-            "prevSib": "previousSibling",
+            "prevSib": "previousSibling"
         }
     },
     manifest: {
@@ -34,35 +35,37 @@ var MODULE =
     scope: {
         entry: function($module, options) {
 
-            if(options.extendProto) {
+            if(options.enabelEnter == true) {
                 extendHTMLElement();
-            }
 
-            if(options.addPrototypeAlias == true) {
+                if(options.addPrototypeAlias == true) {
 
-                // get HTMLElement's prototype
+                    // get HTMLElement's prototype
 
-                var prototype = HTMLElement.prototype;
+                    var prototype = HTMLElement.prototype;
 
-                $Namespace.addAlias(options.HTMLElementMethodAliasMap, prototype);
+                    $Namespace.addAlias(options.HTMLElementMethodAliasMap, prototype);
 
-                // add Get/Set Property to prototype
+                    // add Get/Set Property to prototype
 
-                var attrAliasMap = options.HTMLElementAttributeAliasMap;
+                    var attrAliasMap = options.HTMLElementAttributeAliasMap;
 
-                for(var aliasName in attrAliasMap) {
+                    for(var aliasName in attrAliasMap) {
 
-                    var attrName = attrAliasMap[aliasName];
+                        var attrName = attrAliasMap[aliasName];
 
-                    // use Object.defineProperty
-                    Object.defineProperty(prototype, aliasName,
-                        {
-                            "get": $Function.getClosure(attrName, function() {
-                                return this[passObject];
-                            })
-                        });
+                        // use Object.defineProperty
+                        Object.defineProperty(prototype, aliasName,
+                            {
+                                "get": $Function.getClosure(attrName, function() {
+                                    return this[passObject];
+                                })
+                            });
+                    }
                 }
             }
+
+
             /*
              extendHTMLElement: use prototype extend HTMLElement Class, so manuplate DOM will be handy
              */
@@ -541,7 +544,10 @@ var MODULE =
                 }
 
                 // copy apis
-                copy($module.HTMLExtendClass, HTMLProto);
+
+                if(options.extendProto) {
+                    copy($module.HTMLExtendClass, HTMLProto);
+                }
 
                 // a step for NodeList, it's important to opearte multiple node
 

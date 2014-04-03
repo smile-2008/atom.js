@@ -1,0 +1,10 @@
+/**
+ * @filename stylesheet1.css
+ * @desc stylesheet for application, She is part one.
+ * @theme white
+ */
+
+body {
+	background: url("../resource/angel.jpg");
+}
+

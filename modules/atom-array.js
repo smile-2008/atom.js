@@ -41,7 +41,9 @@ var MODULE =
 
             "and": "arrayAnd",
             "or": "arrayOr",
-            "xor": "arrayXor"
+            "xor": "arrayXor",
+
+            "2A": "toArray"
         }
     },
 
@@ -331,6 +333,11 @@ var MODULE =
             sortedArray = array.sort(callback);
 
             return sortedArray;
+        },
+
+        toArray: function(object) {
+
+            return Array.prototype.slice.call(object, 0);
         }
      }
 }

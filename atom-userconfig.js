@@ -4,4 +4,4 @@
  */
 
 SeedConfig["atomModulesFolder"] = "../modules/";
-
+SeedConfig["atomUIModulesFolder"] = "../ui/";

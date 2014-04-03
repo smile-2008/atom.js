@@ -20,6 +20,11 @@ var AtomConfig =
     author: "shadow" // hi, my world, I AM SHADOW!
 };
 
+var Atom =
+{
+    loaded: false
+};
+
 /*
 config: seed
  */
@@ -28,6 +33,7 @@ var SeedConfig =
 {
     moduleNamePrefix: "atom-",
     atomModulesFolder: "./module/",
+    atomUIModulesFolder: "./ui/",
     userModulesFolder: "./userModules/",
 
     exportModule: true
@@ -62,7 +68,14 @@ AtomModulesMap =
     "sheet": "atom-sheet.js",
     "color": "atom-color.js",
     "htmlcreator": "atom-htmlcreator.js",
-    "json": "atom-json.js"
+    "json": "atom-json.js",
+
+    "selector": "atom-selector.js"
+};
+
+AtomUIModulesMap =
+{
+    "ui-basic": "atom-ui-basic.js"
 };
 
 /** @desc options map
@@ -71,5 +84,9 @@ AtomModulesOption =
 {
     "keyboard": {
         dependence: ["RUNTIME"]
+    },
+
+    "selector": {
+        dependence: ["ELEMENT"]
     }
 };

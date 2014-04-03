@@ -21,7 +21,7 @@ var MODULE = {
 
                 "runtime", "namespace", "browser", "event", "script", "iterator", "question", "data",
                 "number", "string", "object", "function", "array",
-                "math",   "keyboard", "json", "event","element"
+                "math",   "keyboard", "json", "event","element", "selector"
             ]
     },
 

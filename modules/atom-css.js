@@ -5,17 +5,23 @@
 
 /** @class CSS */
 var MODULE = {
+    options: {
+      "extendCSS": false
+    },
     manifest: {
         name: "CSS",
 
-        appendence: ["color", "sheet"]
+        appendence: ["color", "sheet"],
+        dependence: ["element"]
     },
     scope: {
-        entry: function(options) {
+        entry: function($module, options) {
 
-            extendHTMLElementWithCSS();
+            if(options.extendCSS == true) {
+                extendHTMLElementWithCSS();
 
-            funcyPackage();
+                funcyPackage();
+            }
             /*
              * desc: extendHTMLElementWithCSS: add some api to modify DOM's style, depend on 'extendHTMLElement', only css()
              */

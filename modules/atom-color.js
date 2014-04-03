@@ -7,6 +7,9 @@
 var MODULE = {
 
     options: {
+        "workEnable": true,
+
+        "extendProto": false,
         "addToNodeList": true
     },
     manifest: {
@@ -19,20 +22,34 @@ var MODULE = {
 
             /** @step install component for HTMLElement */
 
-            installColorComponent();
+            if(options.workEnable == true) {
+                installColorComponent();
+            }
 
             /** inner */
 
             function installColorComponent() {
 
-                var prototype = HTMLElement.prototype;
+                var apiTarget;
 
                 // get component
                 var component = $keeper.component.ColorHTMLExtension;
 
+                if(options.extendProto == true) {
+                    apiTarget = HTMLElement.prototype;
+                }
+                else {
+                    apiTarget = AtomSelector.api;
+
+                    $Iterator.map(component, function(apiFunc) {
+                        return $keeper.api.returnSelectorAPIs(apiFunc);
+                    });
+                }
+
+
                 // install use $CORE.copy()
 
-                $CORE.copy(component, prototype);
+                $CORE.copy(component, apiTarget);
 
                 // add alias name
                 var aliasMap =
@@ -47,7 +64,7 @@ var MODULE = {
                     "hue139": "setHue139"
                 };
 
-                $Namespace.addAlias(aliasMap, prototype);
+                $Namespace.addAlias(aliasMap, apiTarget);
 
                 // add color apis to HTMLAPIList
 
@@ -69,7 +86,7 @@ var MODULE = {
                         "h139": "setHue139"
                     };
 
-                    $Namespace.addAlias(handyAlias, prototype);
+                    $Namespace.addAlias(handyAlias, apiTarget);
 
                     // if colorAPIs not undefined
                     colorAPIs = colorAPIs.concat($Namespace.getKeyNames(handyAlias));

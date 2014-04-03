@@ -97,9 +97,10 @@ function AtomCreator() {
 
             //debuger.print("module loaded.");
 
-            if(this.moduleTotalCount == this.moduleLoadedCount) {
+            if(this.moduleTotalCount == this.moduleLoadedCount && !Atom.loaded) {
 
                 $loader.emitEvent("atomLoaded");
+                Atom.loaded = true;
             }
         });
 
@@ -347,7 +348,7 @@ function Seed() {
                 var seedScript = document.querySelector("#atom-seed");
 
                 if(seedScript) {
-                    headElement.insertBefore(scriptNode, seedScript);
+                    headElement.insertBefore(seedScript, scriptNode);
                 }
                 else {
                     headElement.appendChild(scriptNode);
@@ -359,23 +360,57 @@ function Seed() {
          * @param moduleFolder a folder contain module
          * @memberof Seed
          */
-        loadModule: function(moduleName, options) {
+        loadModule: function(moduleName, userOptions) {
 
             var loadResult;
 
-            var moduleURL;
-            var moduleFolder;
+            var defaultModulesMap, modulesMap,  moduleURL;
+            var moduleFolder, defaultFolder;
+
+            var optionName, optionValue;
+
+            var options, defOptions = AtomModulesOption[moduleName];
+
+            if(defOptions) {
+
+                if(userOptions && typeof(userOptions) == "object") {
+
+                    for(optionName in userOptions) {
+
+                        optionValue = userOptions[optionName];
+
+                        defOptions[optionName] = optionValue;
+                    }
+                }
+            }
+            else {
+                defOptions = userOptions || {};
+            }
+
+            options = defOptions;
+
+            if(options == "ui" || options.type == "ui") {
+                defaultModulesMap = AtomUIModulesMap;
+                defaultFolder = SeedConfig["atomUIModulesFolder"];
+            }
+            else {
+                defaultModulesMap = AtomModulesMap;
+                defaultFolder = SeedConfig["atomModulesFolder"];
+            }
 
             // check atom's modulesMap
 
-            moduleURL = AtomModulesMap[moduleName];
+            modulesMap = options.modulesMap || defaultModulesMap;
+
+            moduleURL = modulesMap[moduleName];
 
             /* atom's modules folder in '/module/'*/
             if(moduleURL) {
+
                 // get atom module option
                 options = options || AtomModulesOption[moduleName] || {};
 
-                moduleFolder = options.folder || SeedConfig["atomModulesFolder"];
+                moduleFolder = options.folder || defaultFolder;
             }
 
             /* if the request module not in module's map, maybe user's module, first get folder
@@ -621,7 +656,17 @@ function Seed() {
         }
 
         /** @substep enter entry! */
-        scope.entry(module, options);
+
+        var callArgs, entryResult;
+
+        if(manifest.type == "ui") {
+            callArgs = [module, options,  $Selector.AtomSelector, $HTMLCreator.createElement];
+        }
+        else {
+            callArgs = [module, options];
+        }
+
+        entryResult = scope.entry.apply(null, callArgs);
 
         /** @substep load appendence */
 
@@ -632,6 +677,10 @@ function Seed() {
             scope.onFinished();
         }
 
+        if(manifest.type == "ui") {
+            $CORE.copy(entryResult, module);
+            $CORE.copy(entryResult, exportTarget);
+        }
         /** @step log info */
         // get javasript file's name
 

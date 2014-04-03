@@ -195,6 +195,10 @@ var MODULE = {
                 }
             }
 
+            if($Selector.AtomSelector) {
+                resultDOM = $Selector.AtomSelector(resultDOM);
+            }
+
             return resultDOM;
 
         },
