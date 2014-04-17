@@ -273,9 +273,36 @@ var MODULE =
 
                         // call on() in window
                         return window.bind(handler, this, eventType, useCapture);
-                    }
+                    },
 
                     // addClass(): add a className to node's className
+                    addClass: function(className) {
+
+                        var classList  = className.trim().split(" ");
+
+                        for(var classIndex = 0; classIndex < classList.length; classIndex++) {
+
+                            className = classList[classIndex];
+
+                            this.classList.add(className);
+                        }
+
+                        return this;
+                    },
+
+                    removeClass: function(className) {
+
+                        var classList  = className.trim().split(" ");
+
+                        for(var classIndex = 0; classIndex < classList.length; classIndex++) {
+
+                            className = classList[classIndex];
+
+                            this.classList.remove(className);
+                        }
+
+                        return this;
+                    }
                 };
 
                 var DOMTreeAPIs = {
@@ -498,6 +525,25 @@ var MODULE =
                         }
 
                         return this;
+                    },
+
+                    cloneElement: function(cloneSub) {
+
+                        return this.clone(cloneSub);
+                    },
+
+                    parentElement: function() {
+
+                        return this.parentElement;
+                    },
+
+                    "removeElement": function() {
+
+                        var parentElement = this.parentElement;
+
+                        parentElement.removeChild(this);
+
+                        return this;
                     }
                 }
 
@@ -519,7 +565,11 @@ var MODULE =
                     "beforeTo": "beforeToElement",
                     "afterTo": "afterToElement",
 
-                    "swap": "swapElement"
+                    "swap": "swapElement",
+
+                    "clone": "cloneElement",
+                    "parent": "parentElement",
+                    "remove": "removeElement"
                 };
 
                 $Namespace.addAlias(aliasName, $module.HTMLExtendClass);

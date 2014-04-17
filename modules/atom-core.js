@@ -28,6 +28,8 @@ var MODULE = {
     scope: {
         onInit: function() {
 
+            window._a = Atom;
+
             prepareEmitter();
             installEmitter();
 
@@ -292,6 +294,17 @@ var MODULE = {
             // two condition
             return ( (value !== null) && (value !== undefined) );
         },
+
+        deletes: function(object, memberList) {
+
+            memberList.forEach(function(memberName) {
+
+                delete object[memberName];
+            });
+
+            return object;
+        },
+
         makeMethod: function(methodCode, argumentsDefine, methodName) {
 
             var makeResult;
@@ -413,6 +426,30 @@ var MODULE = {
             object.addEventListener(eventType, handler, useCapture);
 
             return object;
+        },
+
+        unbind: function(handler, object, eventType, useCapture) {
+
+            // set default object == window if not define
+            object = object || window;
+
+            if(typeof(eventType) == "undefined") {
+
+                // if object == window, assign 'load'
+                if(object == window) {
+                    eventType = "load";
+                }
+                else if(object instanceof HTMLElement){
+
+                    // it's HTMLElement
+                    eventType = "click";
+                }
+            }
+
+            // remove Event Listener
+            object.removeEventListener(eventType, handler, useCapture);
+
+            return object
         },
         /**
          * @memberof CORE

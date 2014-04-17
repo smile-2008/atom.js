@@ -119,6 +119,10 @@ var MODULE = {
                         element[curProperty] = curArg;
                     }
 
+                    if(window.AtomSelector) {
+                        element = AtomSelector(element);
+                    }
+
                     return element;
                 }
             }

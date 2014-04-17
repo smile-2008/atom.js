@@ -206,7 +206,7 @@ var MODULE =
             // create iterate controller
             var curCtrl = new IterateController(controller, 0);
 
-            if(source.length > 0) {
+            if(source instanceof Array) {
 
                 // check mode, if on clone mode, create new array
                 if(cloneMode == true) {

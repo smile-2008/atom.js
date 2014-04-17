@@ -14,9 +14,23 @@ window.addEventListener("load", onAppLoad);
 
 $(document).ready(appMain);
 
+onAtom(atomMain);
+
 /**
  * application main entry function
  */
 function appMain() {
 
+
+}
+
+/**
+ * application entry for Atom
+ */
+
+function atomMain() {
+
+    dlg1 = new Dialog("Hey, Dialog 1.");
+
+    dlg2 = new Dialog("Hey, Dialog 2.");
 }

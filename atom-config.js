@@ -36,6 +36,8 @@ var SeedConfig =
     atomUIModulesFolder: "./ui/",
     userModulesFolder: "./userModules/",
 
+    atomCSSFolder: "./css/",
+
     exportModule: true
 };
 /**
@@ -75,7 +77,10 @@ AtomModulesMap =
 
 AtomUIModulesMap =
 {
-    "ui-basic": "atom-ui-basic.js"
+    "ui-basic": "atom-ui-basic.js",
+    "ui-plugin": "atom-ui-plugin.js",
+
+    "ui-dialog": "atom-ui-dialog.js"
 };
 
 /** @desc options map
@@ -88,5 +93,9 @@ AtomModulesOption =
 
     "selector": {
         dependence: ["ELEMENT"]
+    },
+
+    "event": {
+        dependence: ["Namespace"]
     }
 };

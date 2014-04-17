@@ -13,7 +13,9 @@ MODULE = {
     manifest: {
         name: "Selector",
 
-        dependence: ["element"]
+        dependence: ["element"],
+
+        appendence: ["ui-basic*"]
     },
 
     scope: {
@@ -49,9 +51,9 @@ MODULE = {
                 });
             }
 
-            if(! false) {
-                $seed.loadModule("ui-basic", "ui");
-            }
+//            if(! false) {
+//                $seed.loadModule("ui-basic", "ui");
+//            }
         }
     },
 
@@ -65,6 +67,7 @@ MODULE = {
 
                     var endIndex, startIndex,
 
+                        apiResult, firstResult,
                         _node;
 
                     endIndex = this.length;
@@ -73,10 +76,18 @@ MODULE = {
 
                         _node = this[startIndex];
 
-                        apiFunc.apply(_node, arguments);
-                    }
+                        apiResult = apiFunc.apply(_node, arguments);
 
-                    return this;
+                        if(startIndex == 0) {
+                            if(apiResult == _node) {
+                                firstResult = this;
+                            }
+                            else {
+                                firstResult = apiResult;
+                            }
+                        }
+                    }
+                    return firstResult;
                 }
             }
         }

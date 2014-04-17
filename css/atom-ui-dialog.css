@@ -1,0 +1,28 @@
+
+.aui-moving {
+	-webkit-user-select: none;
+}
+.aui-dialog {
+	display: inline-block;
+
+	border: 1px solid black;
+	width: 640px;
+
+}
+
+.aui-dialog-title {
+	-webkit-user-select: none;
+	color: white;
+	background: black;
+	font-weight: bold;
+	text-align: center;
+	padding: 4px;
+
+	border-bottom: 1px solid silver;
+	cursor: move;
+}
+
+.aui-dialog-content {
+	height: 320px;
+	background: white;
+}

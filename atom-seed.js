@@ -232,6 +232,10 @@ function AtomLoader() {
 
                     moduleName = appendence[iModule];
 
+                    if(moduleName.match(/\*$/)) {
+                        moduleName = moduleName.replace(/\*$/, "");
+                    }
+
                     if(moduleNameList.indexOf(moduleName) == -1) {
 
                         moduleNameList.push(moduleName);
@@ -355,6 +359,31 @@ function Seed() {
                 }
             }
         },
+
+        loadCSS: function(files, fileFolder) {
+
+            var linkDOM , headElement,
+
+            _cssFile;
+
+            headElement = document.head;
+
+            files = files || [];
+
+            for(var iFile = 0; iFile < files.length; iFile++) {
+
+                _cssFile = files[iFile];
+
+                linkDOM = document.createElement("link");
+
+                linkDOM.href = fileFolder + files;
+                linkDOM.rel = "stylesheet";
+                linkDOM.type = "text/css";
+
+                headElement.appendChild(linkDOM);
+            }
+        },
+
         /**
          * @param moduleName  a name for module
          * @param moduleFolder a folder contain module
@@ -369,6 +398,13 @@ function Seed() {
 
             var optionName, optionValue;
 
+            var isUIModule = false;
+            // if name end with *, set ui
+
+            if(moduleName.match(/\*$/)) {
+                moduleName = moduleName.replace(/\*$/, "");
+                isUIModule = true;
+            }
             var options, defOptions = AtomModulesOption[moduleName];
 
             if(defOptions) {
@@ -389,7 +425,7 @@ function Seed() {
 
             options = defOptions;
 
-            if(options == "ui" || options.type == "ui") {
+            if(isUIModule || options == "ui" || options.type == "ui") {
                 defaultModulesMap = AtomUIModulesMap;
                 defaultFolder = SeedConfig["atomUIModulesFolder"];
             }
@@ -668,9 +704,11 @@ function Seed() {
 
         entryResult = scope.entry.apply(null, callArgs);
 
+        $seed.loadCSS(manifest.css, SeedConfig["atomCSSFolder"]);
+
         /** @substep load appendence */
 
-        $seed.loadModules(manifest.appendence);
+        $seed.loadModules(manifest.appendence, manifest.type);
 
         /** @substep finshed work */
         if(scope.onFinished) {
@@ -678,6 +716,11 @@ function Seed() {
         }
 
         if(manifest.type == "ui") {
+
+            var complexList = manifest.complexUI || [];
+
+            $keeper.api.convertUIConstructors(entryResult, complexList);
+
             $CORE.copy(entryResult, module);
             $CORE.copy(entryResult, exportTarget);
         }

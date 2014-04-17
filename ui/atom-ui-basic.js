@@ -5,12 +5,23 @@
 var MODULE = {
 
     manifest: {
-        name: "basic",
+        name: "ui-basic",
 
-        type: "ui"
+        type: "ui",
+        appendence: ["ui-plugin","ui-dialog"]
     },
 
     scope: {
+
+        onInit: function() {
+
+            Atom.UI =
+            {
+                Plugin: {},
+
+                Vars: {}
+            };
+        },
 
         entry: function($module, options, $, _) {
 
@@ -25,6 +36,48 @@ var MODULE = {
             };
 
             return UIClass;
+        }
+    },
+
+    keep: {
+
+        api: {
+
+            convertUIConstructors: function(UIList, complexList) {
+
+                if(complexList.length > 0) {
+
+                    $Iterator.map(UIList, function(constructor, UID) {
+
+                        var convertResult;
+
+                        if(complexList.indexOf(UID) !== -1) {
+                            convertResult =  $keeper.api.createComplexUIConstructor(constructor);
+                        }
+                        else {
+                            convertResult = constructor;
+                        }
+
+                        return convertResult;
+                    });
+                }
+            },
+            createComplexUIConstructor: function(originalConstructor) {
+
+
+                return ComplexUIConstructor;
+
+                /** @class */
+
+                function ComplexUIConstructor() {
+
+                    var originalUI = this;
+
+                    originalConstructor.apply(originalUI, arguments);
+
+                    originalUI._create();
+                }
+            }
         }
     }
 };
