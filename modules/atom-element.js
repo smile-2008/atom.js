@@ -174,7 +174,7 @@ var MODULE =
                             // modify stylename, use $Browser
                             styleName = $Browser.modifyStyleName(styleName);
 
-                            if(styleValue) {
+                            if(styleValue != null) {
 
                                 // if styleValue indicate, set DOM style
                                 this.style[styleName] = styleValue;
@@ -365,6 +365,8 @@ var MODULE =
 
                             this.appendChild(element);
                         }
+
+                        return this;
                     },
 
                     /** @memberof HTMLExtendClass
