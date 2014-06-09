@@ -6,7 +6,8 @@
 /** @class CSS */
 var MODULE = {
     options: {
-      "extendCSS": false
+      "extendCSS": true,
+      "extendProto": false
     },
     manifest: {
         name: "CSS",
@@ -48,8 +49,9 @@ var MODULE = {
                     transition: "ts", animation: "am", transform: "tf"
                 };
 
-                // get HTMLElement's prototype
-                var HProto = HTMLElement.prototype;
+
+
+                var cssAPIs = {};
 
                 // use for in get every styleName
 
@@ -63,20 +65,25 @@ var MODULE = {
                         shortName = "";
                     }
 
-                    // append to HTMLElement's prototype
-
-                    HProto[styleName] = $keeper.api.returnHTMLChanger("css", styleName);
+                    cssAPIs[styleName] = $keeper.api.returnHTMLChanger("css", styleName);
 
                     // save api to keeper
                     $keeper.list.HTMLAPISet.push(styleName);
 
                     if(shortName !== "") {
-                        HProto[shortName] = HProto[styleName];
+                        cssAPIs[shortName] = cssAPIs[styleName];
 
                         // also save short case
                         $keeper.list.HTMLAPISet.push(shortName);
-                    }
 
+                    }
+                }
+
+
+                $CORE.copy(cssAPIs, $keeper.list.HTMLAPIFuncs);
+
+                if(options.extendProto == true) {
+                    $CORE.copy(cssAPIs, HTMLElement.prototype);
                 }
             }
             /**
@@ -89,12 +96,27 @@ var MODULE = {
 
                 var CSSMap =
                 {
-                    huge: [["fontSize", "fontWeight", "fontFamily"], ["48px", "bold", "impact"]]
+                    huge: [["fontSize", "fontWeight", "fontFamily"], ["48px", "bold", "impact"]],
+                    shape: [["width", "height", "position"], ["100px", "100px", "relative"]],
+                    xy: [["left", "top", "position"],["0px", "0px", "absolute"]]
                 };
 
                 // only call a api
                 $keeper.api.extendHTML("css", CSSMap);
             }
+        }
+    },
+
+    keep: {
+
+        list: {
+
+            "dimensionStyles":
+                [
+                    "width", "height", "top", "left", "right", "bottom",  "borderRadius", "borderLeft",  "borderRight", "borderTop", "borderBottom",
+                    "margin", "padding",
+                    "marginLeft", "marginRight", "marginTop", "marginBottom", "paddingLeft", "paddingTop", "paddingRight", "paddingBottom"
+                ]
         }
     }
 }

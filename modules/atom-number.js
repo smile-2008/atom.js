@@ -64,6 +64,59 @@ var MODULE = {
         isNaN: function(number) {
 
             return (number !== number);
+        },
+
+        isInt: function(value, forceInt) {
+
+            var typeofValue = typeof(value),
+                computeValue,
+                result = false;
+
+            if(typeofValue == "number") {
+
+                computeValue = value % 1;
+
+                if(computeValue == 1 || computeValue == 0) {
+                    result = true;
+                }
+            }
+            else {
+
+                value = value.toString();
+
+                result = Boolean(value.match(/^(-|\+)*\d+$/)) && !forceInt;
+            }
+
+            return result;
+        },
+
+        isFloat: function(value, forceFloat) {
+
+            var typeofValue = typeof(value),
+                computeValue,
+                result = false;
+
+            if(typeofValue == "number") {
+
+                computeValue = value % 1;
+
+                if(computeValue !== 1 && computeValue !== 0) {
+                    result = true;
+                }
+            }
+            else {
+
+                value = value.toString();
+
+                result = Boolean(value.match(/^(-|\+)*\d*\.\d+$/)) && !forceFloat;
+            }
+
+            return result;
+        },
+
+        isNumeric: function(value, forceNumber) {
+
+           return $Number.isInt(value, forceNumber) || $Number.isFloat(value, forceNumber);
         }
     }
 }

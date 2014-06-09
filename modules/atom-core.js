@@ -21,7 +21,7 @@ var MODULE = {
 
                 "runtime", "namespace", "browser", "event", "script", "iterator", "question", "data",
                 "number", "string", "object", "function", "array",
-                "math",   "keyboard", "json", "event","element", "selector"
+                "math",  "event", "keyboard", "json", "element", "selector"
             ]
     },
 
@@ -39,7 +39,7 @@ var MODULE = {
                 /** @step create two array */
                 $keeper.pit.EMITTER_OBJ = new Array();
 
-                $keeper.pit.EMITTER_HANDLER = new Array();
+                $keeper.pit.EMITTER_STORAGE = new Array();
             }
 
             /** @memberof CORE */
@@ -422,6 +422,8 @@ var MODULE = {
                 }
             }
 
+            handler = $CORE.makeMethod(handler);
+
             // add a Event Listener
             object.addEventListener(eventType, handler, useCapture);
 
@@ -483,10 +485,10 @@ var MODULE = {
 
                     _thisObj = this;
                     // access pit
-                    var objList, handlerList;
+                    var objList, storageList;
 
                     objList = $keeper.pit.EMITTER_OBJ;
-                    handlerList = $keeper.pit.EMITTER_HANDLER;
+                   storageList = $keeper.pit.EMITTER_STORAGE;
 
                     // check pit
 
@@ -495,26 +497,33 @@ var MODULE = {
                     if(checkIndex !== -1) {
 
                         // get handler
-                        var curTypeHandler;
-                        var handlerLength;
+                        var curTypeStorage
 
-                        curTypeHandler = handlerList[checkIndex][eventType];
+                        var storageLength;
+
+                        curTypeStorage = storageList[checkIndex][eventType];
 
                         // if have handler, call them
-                        if(curTypeHandler && curTypeHandler.length > 0) {
+                        if(curTypeStorage && curTypeStorage.length > 0) {
 
-                            handlerLength = curTypeHandler.length;
+                            storageLength = curTypeStorage.length;
 
-                            for(var iHandler = 0; iHandler < curTypeHandler.length; iHandler++) {
+                            for(var iHandler = 0; iHandler < storageLength; iHandler++) {
 
-                                var curCallback = curTypeHandler[iHandler];
+                                var curUnit = curTypeStorage[iHandler],
 
+                                    curCallback = curUnit.callback;
+
+                                if(curUnit.data) {
+                                    userArguments = userArguments || [];
+                                    userArguments.unshift(curUnit.data);
+                                }
                                 // call function use argument
                                 curCallback.apply(_thisObj, userArguments);
                             }
 
                             // set result equal true
-                            emitResult = handlerLength;
+                            emitResult = storageLength;
                         }
                         else {
                             emitResult = -1;
@@ -528,15 +537,15 @@ var MODULE = {
                 },
 
                 /** @memberof Emitter */
-                on: function(eventType, callback) {
+                on: function(eventType, callback, tagSelector, data) {
 
                     // GET TOW LIST
-                    var objs = $keeper.pit.EMITTER_OBJ;
-                    var handlers = $keeper.pit.EMITTER_HANDLER;
+                    var objs = $keeper.pit.EMITTER_OBJ,
+                        storage = $keeper.pit.EMITTER_STORAGE;
 
                     var _thisObj = this;
 
-                    var objHandler;
+                    var objStorage;
 
                     /** @step check object */
 
@@ -546,33 +555,69 @@ var MODULE = {
                         objs.push(_thisObj);
 
                         // create handler
-                        objHandler = new Object();
+                        objStorage = new Object();
 
                         // push to list
-                        handlers.push(objHandler);
+                        storage.push(objStorage);
                     }
                     else {
-
                         // if finded, get handler
-                        objHandler = handlers[objIndex];
+                        objStorage = storage[objIndex];
                     }
 
                     /**@step add callback */
 
-                    var curTypeHandler = objHandler[eventType];
+                    var curTypeStorage = objStorage[eventType];
 
-                    if(! curTypeHandler) {
+                    if(! curTypeStorage) {
                         // create a array storage callback function
-                        curTypeHandler = new Array();
+                        curTypeStorage = new Array();
 
-                        objHandler[eventType] = curTypeHandler;
+                        objStorage[eventType] = curTypeStorage;
                     }
 
-                    // push argument callback to array
-                    curTypeHandler.push(callback);
+                    var callbackUnit = {};
+
+                    callbackUnit.data = data;
+                    callback = $CORE.makeMethod(callback);
+                    callbackUnit.callback = callback;
+
+                    curTypeStorage.push(callbackUnit);
+
+
+                    // if event type is browser event
+
+                    var hasTagSelector = false;
+
+                    if($keeper.list.languagesEvent.indexOf(eventType) !== -1) {
+
+                        if(tagSelector) {
+                            hasTagSelector = true;
+                        }
+
+                        this.addEventListener(eventType, fnGetEventCallback(callback, data), hasTagSelector)
+                    }
 
                     return _thisObj;
+
+                    function fnGetEventCallback(callback, _userData) {
+
+                        var userData = _userData;
+
+                        return fnEventCallback;
+
+                        function fnEventCallback(event) {
+
+                            var target = event.target;
+
+                            if(!hasTagSelector || target.tagName == tagSelector) {
+                                event.data = userData;
+                                callback.apply(this, arguments);
+                            }
+                        }
+                    }
                 }
+
             }
         }
     }

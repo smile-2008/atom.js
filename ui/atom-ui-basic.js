@@ -58,6 +58,8 @@ var MODULE = {
                             convertResult = constructor;
                         }
 
+                        Atom.UI[UID] = convertResult;
+
                         return convertResult;
                     });
                 }

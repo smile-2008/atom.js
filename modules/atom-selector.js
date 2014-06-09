@@ -6,7 +6,7 @@ MODULE = {
 
     options: {
 
-        selectorSymbol: ["get", "sel", "$$$"],
+        selectorSymbol: ["get", "sel", "$$$", "v"],
 
         loadUI: true
     },
@@ -22,23 +22,24 @@ MODULE = {
 
         entry: function($module, options) {
 
-            var selectorAPIs, APISet, apiMethod;
+            var selectorAPIs = {}, APISet, apiMethod,
+
+                HTMLEmitter = new $CORE.Emitter();
 
             if(true) {
 
                 // create apis object
 
-                selectorAPIs = {};
+                $CORE.copy($ELEMENT.HTMLExtendClass, selectorAPIs);
+                $CORE.copy($keeper.list.HTMLAPIFuncs, selectorAPIs);
+                $CORE.copy(HTMLEmitter, selectorAPIs);
+
                 $keeper.list.AtomSelectorAPIs = selectorAPIs;
                 $module.AtomSelector.api = selectorAPIs;
 
+                for(var apiName in selectorAPIs) {
 
-                APISet = $ELEMENT.HTMLExtendClass;
-
-
-                for(var apiName in APISet) {
-
-                    apiMethod = APISet[apiName];
+                    apiMethod = selectorAPIs[apiName];
 
                     selectorAPIs[apiName] = $keeper.api.returnSelectorAPIs(apiMethod);
                 }
@@ -59,7 +60,9 @@ MODULE = {
 
     "keep": {
         "api": {
-            "returnSelectorAPIs": function (apiFunc) {
+            "returnSelectorAPIs": function (apiFunc, options) {
+
+                options = options || {};
 
                 return SelectorAPIFunc;
 
@@ -68,13 +71,23 @@ MODULE = {
                     var endIndex, startIndex,
 
                         apiResult, firstResult,
-                        _node;
+                        _node, firstArg;
 
                     endIndex = this.length;
 
                     for(var startIndex = 0; startIndex < endIndex; startIndex++) {
 
                         _node = this[startIndex];
+
+                        if(options.unshiftThis == true) {
+                            arguments = $Array.toArray(arguments);
+
+                            firstArg = _node;
+                            if(options.addSelector == true) {
+                                firstArg = AtomSelector(_node);
+                            }
+                            arguments.unshift(firstArg);
+                        }
 
                         apiResult = apiFunc.apply(_node, arguments);
 
@@ -118,6 +131,10 @@ MODULE = {
 
                         _this.push(selector);
                     }
+                    else if($Array.isLikeArray(selector)) {
+
+                        _this = selector;
+                    }
                 }
                     break;
             }
@@ -125,6 +142,8 @@ MODULE = {
             // copy functions
 
             $CORE.copy($keeper.list.AtomSelectorAPIs, _this);
+
+            _this.atom = "1.0";
 
             return _this;
         }

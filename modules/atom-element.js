@@ -33,6 +33,11 @@ var MODULE =
     },
 
     scope: {
+        onInit: function() {
+
+            $keeper.list.HTMLAPIFuncs = {};
+
+        },
         entry: function($module, options) {
 
             if(options.enabelEnter == true) {
@@ -113,7 +118,9 @@ var MODULE =
                         var cssReturn; // return value
 
                         // use window.getComputedStyle()
-                        var comStyle;
+                        var comStyle,
+
+                            dimensionStyles = $keeper.list.dimensionStyles;
 
                         comStyle = window.getComputedStyle(this);
 
@@ -161,6 +168,12 @@ var MODULE =
                                     // get value
                                     styleValue = arg1Obj[styleName];
 
+                                    if($Number.isNumeric(styleValue) &&
+                                        (dimensionStyles.indexOf(styleName) !== -1)) {
+
+                                        styleValue += "px";
+                                    }
+
                                     // set value to DOM
                                     this.style[styleName] = styleValue;
 
@@ -175,6 +188,14 @@ var MODULE =
                             styleName = $Browser.modifyStyleName(styleName);
 
                             if(styleValue != null) {
+
+                                // add unit
+
+                                if($Number.isNumeric(styleValue) &&
+                                    (dimensionStyles.indexOf(styleName) !== -1)) {
+
+                                    styleValue += "px";
+                                }
 
                                 // if styleValue indicate, set DOM style
                                 this.style[styleName] = styleValue;
@@ -347,7 +368,11 @@ var MODULE =
                         if(elementType == "string") {
 
                             // generate element from string
-                            element = $HTMLCreator.createElementFromString(element);
+                            //element = $HTMLCreator.createElementFromString(element);
+
+                            element = document.createTextNode(element);
+
+                            this.appendChild(element);
                         }
                         else if(element.length > 0) {
 
@@ -552,6 +577,21 @@ var MODULE =
 
                 copy(DOMTreeAPIs, $module.HTMLExtendClass);
 
+                var DOMCSSAPIs =
+                {
+                    resize: function(direction) {
+
+                        direction = direction || "both";
+
+                        this.style.resize = direction;
+                        this.style.overflow = "auto";
+
+                        return this;
+                    }
+                };
+
+                copy(DOMCSSAPIs, $module.HTMLExtendClass);
+
                 // add alias name
 
                 var aliasName =
@@ -575,6 +615,8 @@ var MODULE =
                 };
 
                 $Namespace.addAlias(aliasName, $module.HTMLExtendClass);
+
+
 
                 // if on handy mode, copy the shortest name
                 if($_handyMode == true) {
@@ -621,14 +663,14 @@ var MODULE =
                 // now, expose a function to extend HTMLElemnt prototype quickly
 
                 // first argument's type is unsure，the argument's name is boring
-                $keeper.api.extendHTML = function(extMode, arg1, arg2, arg3) {
+                $keeper.api.extendHTML = function(extMode, arg1, arg2, arg3, addToPrototype) {
 
                     // get arg1's type
                     var arg1Type = typeof arg1;
 
                     var apiName, api;
 
-                    var HTMLProto = HTMLElement.prototype;
+                    var HTMLAPIs = {};
 
                     // arg3 almost use set extend mode, both 'css' and 'attr'
 
@@ -641,7 +683,7 @@ var MODULE =
                         {
                             apiName = arg1;
 
-                            HTMLProto[apiName] = returnHTMLChanger(extMode, arg2, arg3);
+                            HTMLAPIs[apiName] = returnHTMLChanger(extMode, arg2, arg3);
 
                             // push api to set
                             $keeper.list.HTMLAPISet.push(apiName);
@@ -673,13 +715,19 @@ var MODULE =
                                     defValues = curSet[1];
                                 }
                                 // done!
-                                HTMLProto[apiName] = returnHTMLChanger(extMode, nameArray, defValues);
+                                HTMLAPIs[apiName] = returnHTMLChanger(extMode, nameArray, defValues);
 
                                 // push html api'name
                                 $keeper.list.HTMLAPISet.push(apiName);
                             }
                         }
                             break;
+                    }
+
+                    $CORE.copy(HTMLAPIs, $keeper.list.HTMLAPIFuncs);
+
+                    if(addToPrototype == true) {
+                        $CORE.copy(HTMLElement.prototype, AtomSelector.api);
                     }
                 }
 
@@ -780,7 +828,8 @@ var MODULE =
 
                         var A1, A2; // argument1, argument2
 
-                        var thatValue;
+                        var thatValue,
+                            _this = window.AtomSelector(this)
 
                         if(singleMode == true) {
                             A1 = thatName;
@@ -808,7 +857,7 @@ var MODULE =
                             }
                         }
                         // the api not exist in original browser scope, it's Atom's component
-                        return this[mode].call(this, A1, A2);
+                        return _this[mode].call(_this, A1, A2);
                     }
                 }
             }

@@ -22,9 +22,17 @@ var MODULE =
             if(AtomConfig.handyMode == true) {
                 window.$TABLE = tableObj;
             }
+
+
         },
         entry: function() {
 
+        },
+
+        alias: {
+
+            JS: "loadScript",
+            CSS: "loadCSS"
         }
     },
     members: {
@@ -58,7 +66,7 @@ var MODULE =
 
                 // if executed is true, execute function
                 if(executed == true) {
-                    result = method.apply(null, userArguments);
+                    result = method.apply(null, userArguments || arguments);
                 }
                 else {
                     result = method;
@@ -66,6 +74,10 @@ var MODULE =
 
                 return result;
             }
-        }
+        },
+
+        loadScript: $seed.loadScript,
+
+        loadCSS: $seed.loadCSS
     }
 }

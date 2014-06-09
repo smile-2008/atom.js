@@ -6,7 +6,8 @@
 var MODULE =
 {
     options: {
-        classDialog: "aui-dialog "
+        classDialog: "aui-dialog ",
+        dialogIndex: 7000
     },
     manifest: {
         name: "ui-dialog",
@@ -31,7 +32,9 @@ var MODULE =
 
                         content = content || "empty",
                         classDialog = options.classDialog,
-                        nodeDlgRoot, nodeDlgTitle, nodeDlgContent;
+                        nodeDlgRoot, nodeDlgTitle, nodeDlgIcon, nodeDlgTitleContent, nodeDlgContent,
+
+                        isIconMode ,isDlgShow;
 
                         Options =
                         {
@@ -39,15 +42,21 @@ var MODULE =
 
                             titleClass: "aui-dialog-title",
                             contentClass: "aui-dialog-content",
+                            iconClass: "aui-dialog-icon",
+                            "titleIconClass": "aui-dialog-icon-mode",
 
                             titleText: "dialog",
 
                             left: 0,
                             top: 0,
+                            width: null,
+                            height: null,
                             position: "absolute",
                             zIndex: 1,
 
                             enableMove: true,
+                            isShow: true,
+                            isIcon: false,
 
                             parentNode: $("body")
                         };
@@ -61,12 +70,20 @@ var MODULE =
                             classDialog += Options.className;
                             nodeDlgRoot = _("div").addClass(classDialog);
 
+                            _the.root = nodeDlgRoot;
+
                             // create title box
-                            nodeDlgTitle = _("div").addClass(Options.titleClass).html(Options.titleText);
+                            nodeDlgTitle = _("div").addClass(Options.titleClass);
+
+                            nodeDlgTitleContent = _("div").append(Options.titleText);
+                            nodeDlgTitle.append(nodeDlgTitleContent);
+
+                            nodeDlgIcon = _("span").addClass(Options.iconClass);
+                            nodeDlgTitle.append(nodeDlgIcon);
 
                             // create content box
 
-                            nodeDlgContent = _("div").addClass(Options.contentClass).html(content);
+                            nodeDlgContent = _("div").addClass(Options.contentClass).append(content);
 
                             nodeDlgRoot.append(nodeDlgTitle).append(nodeDlgContent);
 
@@ -77,7 +94,11 @@ var MODULE =
                             nodeDlgRoot
                                 .css("position", Options.position)
                                 .css("left", Options.left)
-                                .css("top", Options.top);
+                                .css("top", Options.top)
+
+                            nodeDlgContent
+                                .css("width",Options.width)
+                                .css("height", Options.height);
 
                             // enable move
 
@@ -86,8 +107,15 @@ var MODULE =
                                 Atom.UI.Plugin.enableMove(nodeDlgTitle, nodeDlgRoot);
                             }
 
-                            //
-                            nodeDlgRoot.listen("mousedown", this.__onClick_zIndex, true);
+                            // add event listener
+
+                            nodeDlgRoot.listen("mousedown", _the.__onClick_zIndex, true)
+                            nodeDlgTitle.listen("dblclick", _the.__onDblclick_toggleIcon, true);
+
+                            // show or hide
+
+                            _the.toggle(true, Options.isIcon);
+                            _the.toggle(false, Options.isShow);
                         }
                         ,
                         __onClick_zIndex: function(event) {
@@ -96,17 +124,120 @@ var MODULE =
 
                             nodeDlg = this;
 
-                            nodeDlg.style.zIndex = 2;
+                            nodeDlg.style.zIndex = options.dialogIndex + 2;
 
                             // restore previous dlg
 
                             prevDlg = Atom.UI.Vars.focusDlg;
 
                             if(prevDlg) {
-                                prevDlg.style.zIndex = 1;
+                                prevDlg.style.zIndex = options.dialogIndex + 1;
                             }
 
                             Atom.UI.Vars.focusDlg = nodeDlg;
+                        },
+
+                        __onDblclick_toggleIcon: function(event) {
+                            _the.toggle(true, !isIconMode);
+
+                        },
+
+                        getRootNode: function() {
+
+                            return nodeDlgRoot;
+                        },
+
+                        setCoordinate: function(leftValue, topValue) {
+
+                            if(leftValue != null) {
+                                nodeDlgRoot.css("left", leftValue);
+                            }
+
+                            if(topValue != null) {
+                                nodeDlgRoot.css("top", topValue);
+                            }
+
+                            return nodeDlgRoot;
+                        },
+                        append: function(content) {
+
+                            nodeDlgContent.append(content);
+
+                            return _the;
+                        },
+
+                        show: function(iconMode) {
+
+                            if(iconMode == true) {
+                                nodeDlgIcon.hide();
+
+                                nodeDlgRoot.removeClass(Options.titleIconClass);
+                                nodeDlgTitleContent.show();
+                                nodeDlgContent.show();
+
+                                isIconMode = false;
+                            }
+                            else {
+                                nodeDlgRoot.show();
+                                isDlgShow = true;
+                            }
+
+                            return _the;
+                        },
+
+                        hide: function(iconMode) {
+
+                            if(iconMode == true) {
+                                nodeDlgIcon.show();
+
+                                nodeDlgRoot.addClass(Options.titleIconClass);
+                                nodeDlgTitleContent.hide();
+                                nodeDlgContent.hide();
+
+                                isIconMode = true;
+                            }
+                            else {
+                                nodeDlgRoot.hide();
+                                isDlgShow = false;
+                            }
+
+                            return _the;
+                        },
+
+                        toggle: function(iconMode, forceValue) {
+
+                            var modeValue;
+
+                            if(iconMode == true) {
+
+                                modeValue = ! isIconMode;
+                                if(forceValue != null) {
+                                    modeValue = forceValue;
+                                }
+
+                                if(modeValue == true) {
+                                    _the.hide(true);
+                                }
+                                else {
+                                    _the.show(true);
+                                }
+                            }
+                            else {
+
+                                modeValue = ! isDlgShow;
+                                if(forceValue != null) {
+                                    modeValue = forceValue;
+                                }
+
+                                if(modeValue == true) {
+                                    _the.show(false);
+                                }
+                                else {
+                                    _the.hide(false);
+                                }
+                            }
+
+                            return _the;
                         }
                     };
 

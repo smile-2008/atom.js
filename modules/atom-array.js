@@ -338,6 +338,23 @@ var MODULE =
         toArray: function(object) {
 
             return Array.prototype.slice.call(object, 0);
+        },
+
+        isLikeArray: function(object) {
+
+            var objectClass = object.constructor.name,
+
+                result = $keeper.list.likeArrayType.indexOf(objectClass);
+
+            return (result != -1);
         }
-     }
+    },
+
+    keep: {
+
+        list:
+        {
+            likeArrayType: ["NodeList", "HTMLCollection", "Array"]
+        }
+    }
 }

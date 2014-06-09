@@ -11,7 +11,8 @@
 var MODULE = {
 
     options: {
-        listenerPrefix: ""
+        listenerPrefix: "",
+        extendProto: false
     },
     manifest: {
         name: "event",
@@ -22,9 +23,9 @@ var MODULE = {
 
         entry: function($module, options) {
 
-            // add Listener to HTMLElement
+            var eventAPIs = {};
 
-            var prototype = HTMLElement.prototype;
+            // add Listener to HTMLElement
 
             var eventList = $list.languagesEvent;
 
@@ -44,31 +45,37 @@ var MODULE = {
 
                 // if some api exist that has same name, rename it
 
-                var existedAPI = prototype[listenerName];
+                var existedAPI = eventAPIs[listenerName];
 
                 if(existedAPI) {
-                    prototype["__" + existedAPI.name] = existedAPI;
+                    eventAPIs["__" + existedAPI.name] = existedAPI;
                 }
 
                 // get listener
-                prototype[listenerName] = $api.returnDOMListener(eventName, existedAPI);
+                eventAPIs[listenerName] = $api.returnDOMListener(eventName, existedAPI);
+            }
 
-                /** @step install component */
+            /** @step install component */
 
-                var eventCOM = $COM.HTMLEventExtension;
+            var eventCOM = $COM.HTMLEventExtension;
 
-                $CORE.copy(eventCOM, prototype);
+            $CORE.copy(eventCOM, eventAPIs);
 
-                var aliasMap =
-                {
-                    "mouse": "onMouse",
-                    "keyboard": "onKeyboard",
-                    "key": "onKeyboard",
-                    "mousearea": "onMouseArea",
-                    "area": "onMouseArea"
-                };
+            var aliasMap =
+            {
+                "mouse": "onMouse",
+                "keyboard": "onKeyboard",
+                "key": "onKeyboard",
+                "mousearea": "onMouseArea",
+                "area": "onMouseArea"
+            };
 
-                $Namespace.addAlias(aliasMap, prototype);
+            $Namespace.addAlias(aliasMap, eventAPIs);
+
+            $CORE.copy(eventAPIs, $keeper.list.HTMLAPIFuncs);
+
+            if(options.extendProto == true) {
+                $CORE.copy(eventAPIs, HTMLElement.prototype);
             }
         }
     },

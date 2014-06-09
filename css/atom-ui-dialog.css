@@ -6,8 +6,15 @@
 	display: inline-block;
 
 	border: 1px solid black;
-	width: 640px;
+}
 
+.aui-dialog.aui-dialog-icon-mode {
+    width: 24px;
+}
+
+.aui-dialog.aui-dialog-icon-mode .aui-dialog-title {
+    padding: 0px;
+    border-bottom: none;
 }
 
 .aui-dialog-title {
@@ -20,9 +27,23 @@
 
 	border-bottom: 1px solid silver;
 	cursor: move;
+    position: relative;
 }
 
 .aui-dialog-content {
-	height: 320px;
 	background: white;
+    width: 640px;
+    height: 480px;
+    resize: both;
+    overflow: auto;
+}
+
+.aui-dialog-icon {
+    width: 24px;
+    height: 24px;
+    top: 0px;
+    left: 0px;
+    position: relative;
+    display: inline-block;
+    background: inherit;
 }

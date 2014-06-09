@@ -55,7 +55,7 @@ var MODULE =
             }
 
             /** desc $f_KeyboardEventListener */
-            function $f_KeyboardEventListener() {
+            function $f_KeyboardEventListener(event) {
 
                 var eventType = event.type;
 
