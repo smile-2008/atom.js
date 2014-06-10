@@ -230,6 +230,8 @@ var MODULE = {
             // set id
             element.id = id || "";
 
+            element = AtomSelector(element);
+
             return element;
         }
     }

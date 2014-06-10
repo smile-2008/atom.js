@@ -1,0 +1,16 @@
+.atom-shadow {
+
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 7010;
+}
+
+.atom-shadow-cover {
+    background: black;
+    opacity: 0.8;
+    width: 100%;
+    height: 100%;
+}

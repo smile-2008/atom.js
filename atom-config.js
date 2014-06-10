@@ -22,7 +22,9 @@ var AtomConfig =
 
 var Atom =
 {
-    loaded: false
+    loaded: false,
+
+    year: 2004
 };
 
 /*
@@ -65,6 +67,7 @@ AtomModulesMap =
     "random": "atom-random.js",
     "keyboard": "atom-keyboard.js",
     "element": "atom-element.js",
+    "canvas": "atom-canvas.js",
 
     "css": "atom-css.js",
     "sheet": "atom-sheet.js",

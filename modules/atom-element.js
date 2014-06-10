@@ -16,11 +16,12 @@ var MODULE =
         },
 
         HTMLElementAttributeAliasMap: {
-            "nextEle": "nextElementSibling",
+            "next": "nextElementSibling",
             "nextSib": "nextSibling",
 
-            "prevEle": "previousElementSibling",
-            "prevSib": "previousSibling"
+            "prev": "previousElementSibling",
+            "prevSib": "previousSibling",
+            "parent": "parentElement"
         }
     },
     manifest: {
@@ -40,37 +41,23 @@ var MODULE =
         },
         entry: function($module, options) {
 
+            var HTMLAPIFuncs = $keeper.list.HTMLAPIFuncs;
+
             if(options.enabelEnter == true) {
+
                 extendHTMLElement();
 
-                if(options.addPrototypeAlias == true) {
+                var attrAliasMap = options.HTMLElementAttributeAliasMap;
 
-                    // get HTMLElement's prototype
+                for(var aliasName in attrAliasMap) {
 
-                    var prototype = HTMLElement.prototype;
+                    var attrName = attrAliasMap[aliasName];
 
-                    $Namespace.addAlias(options.HTMLElementMethodAliasMap, prototype);
-
-                    // add Get/Set Property to prototype
-
-                    var attrAliasMap = options.HTMLElementAttributeAliasMap;
-
-                    for(var aliasName in attrAliasMap) {
-
-                        var attrName = attrAliasMap[aliasName];
-
-                        // use Object.defineProperty
-                        Object.defineProperty(prototype, aliasName,
-                            {
-                                "get": $Function.getClosure(attrName, function() {
-                                    return this[passObject];
-                                })
-                            });
-                    }
+                    HTMLAPIFuncs[aliasName] = $Function.getClosure(attrName,function() {
+                            return this[passObject];
+                    });
                 }
             }
-
-
             /*
              extendHTMLElement: use prototype extend HTMLElement Class, so manuplate DOM will be handy
              */
@@ -293,7 +280,7 @@ var MODULE =
                     bind: function(handler, eventType, useCapture) {
 
                         // call on() in window
-                        return window.bind(handler, this, eventType, useCapture);
+                        return window.bind(handler, eventType, this,  useCapture);
                     },
 
                     // addClass(): add a className to node's className
@@ -353,7 +340,6 @@ var MODULE =
 
                         return this;
                     },
-
                     /** @memberof HTMLCreator
                      *  @desc append html element to this
                      *  @paran elements the elements to be appended, maybe a nodelist
@@ -442,6 +428,7 @@ var MODULE =
 
                         var parentElement = this.parentElement;
 
+                        sourceElement = getNodeFromList(sourceElement);
                         // use HTMLElement.insertBefore() api
                         parentElement.insertBefore(sourceElement, this);
 
@@ -556,12 +543,7 @@ var MODULE =
 
                     cloneElement: function(cloneSub) {
 
-                        return this.clone(cloneSub);
-                    },
-
-                    parentElement: function() {
-
-                        return this.parentElement;
+                        return this.cloneNode(cloneSub);
                     },
 
                     "removeElement": function() {
@@ -571,6 +553,43 @@ var MODULE =
                         parentElement.removeChild(this);
 
                         return this;
+                    },
+
+                    allParents: function(tagFilter) {
+
+                        var parentElement, curNode,
+
+                            parentList = [];
+
+                        curNode = this;
+                        do {
+                            parentElement = curNode.parentElement;
+                            curNode = parentElement;
+
+                            if(parentElement) {
+
+                                if(!tagFilter || tagFilter == parentElement.tagName) {
+
+                                    parentList.push(parentElement);
+                                }
+                            }
+                        } while(parentElement);
+
+                        parentList = $$(parentList);
+
+                        return parentList;
+                    },
+
+                    isInDocument: function() {
+
+                        var element = $$(this),
+
+                            parents = element.allParents(),
+
+                            htmlElement = parents[parents.length - 1];
+
+                        return (htmlElement == document.documentElement);
+
                     }
                 }
 
@@ -585,6 +604,113 @@ var MODULE =
 
                         this.style.resize = direction;
                         this.style.overflow = "auto";
+
+                        return this;
+                    },
+
+                    center: function(centerLeft, centerTop) {
+
+                        if(centerLeft !== false) {
+                            $$(this).left("center");
+                        }
+
+                        if(centerTop !== false) {
+                            $$(this).top("center");
+                        }
+
+                        return this;
+                    },
+
+                    left: function(value, parentNode) {
+
+                        var parseValue = parseFloat(value),
+                            nodeWidth, parentWidth;
+
+                        if(parseValue !== parseValue) {
+
+                            // not number value
+                            if(parentNode) {
+                                parentNode = getNodeFromList(parentNode);
+                                parentWidth = parentNode.clientWidth;
+                            }
+                            else {
+                                parentWidth = window.innerWidth;
+                            }
+
+                            nodeWidth = this.clientWidth;
+
+                            switch(value) {
+
+                                case "left":
+                                {
+                                    value = 0;
+                                }
+                                    break;
+
+                                case "center":
+                                {
+                                    value = (parentWidth - nodeWidth) / 2;
+                                }
+                                    break;
+
+                                case "right":
+                                {
+                                    value = parentWidth - nodeWidth;
+                                }
+                            }
+
+                        }
+
+                        this.style.left = value  + "px";
+
+                        return this;
+                    },
+
+                    top: function(value, parentNode) {
+
+                        var parseValue,
+
+                            nodeHeight, parentHeight;
+
+                        parseValue = window.parseFloat(value);
+
+                        if(parseValue !== parseValue) {
+
+                            // not number type
+
+                            if(parentNode) {
+                                parentNode = getNodeFromList(parentNode);
+                                parentHeight = parentNode.clientHeight;
+                            }
+                            else {
+                                parentHeight = window.innerHeight;
+                            }
+
+                            nodeHeight = this.clientHeight;
+
+                            switch(value) {
+
+                                case "left":
+                                {
+                                    value = 0;
+                                }
+                                    break;
+
+                                case "center":
+                                {
+                                    value = (parentHeight - nodeHeight) / 2;
+                                }
+                                    break;
+
+                                case "top":
+                                {
+                                    value = parentHeight - nodeHeight;
+                                }
+                                    break;''
+                            }
+                        }
+
+                        this.style.top = value + "px";
 
                         return this;
                     }
@@ -610,8 +736,10 @@ var MODULE =
                     "swap": "swapElement",
 
                     "clone": "cloneElement",
-                    "parent": "parentElement",
-                    "remove": "removeElement"
+                    "remove": "removeElement",
+
+                    "parents": "allParents",
+                    "isIn": "isInDocument"
                 };
 
                 $Namespace.addAlias(aliasName, $module.HTMLExtendClass);
@@ -655,7 +783,7 @@ var MODULE =
 
 
                 // then set a handler for onload event, use extend NodeList
-                bind(extendNodeList, window, "load");
+                listen("load", extendNodeList);
 
                 // add 'returnHTMLChanger' to keeper for use later
                 $keeper.addAPI(returnHTMLChanger, "returnHTMLChanger");
@@ -862,5 +990,30 @@ var MODULE =
                 }
             }
         }
+
+
+    },
+
+    members: {
+
+        "getNodeFromList": function(nodelist, index) {
+
+            var index = index || 0,
+                node;
+
+            if(nodelist instanceof HTMLElement) {
+                node = nodelist;
+            }
+            else {
+
+                if(nodelist.length) {
+                    node = nodelist[index];
+                }
+            }
+
+            return node;
+        }
     }
+
+
 }

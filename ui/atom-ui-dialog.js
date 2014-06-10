@@ -49,10 +49,11 @@ var MODULE =
 
                             left: 0,
                             top: 0,
-                            width: null,
-                            height: null,
+                            width: 600,
+                            height: 400,
                             position: "absolute",
                             zIndex: 1,
+                            color: "black",
 
                             enableMove: true,
                             isShow: true,
@@ -70,7 +71,7 @@ var MODULE =
                             classDialog += Options.className;
                             nodeDlgRoot = _("div").addClass(classDialog);
 
-                            _the.root = nodeDlgRoot;
+                            _the.node = nodeDlgRoot;
 
                             // create title box
                             nodeDlgTitle = _("div").addClass(Options.titleClass);
@@ -91,6 +92,11 @@ var MODULE =
 
                             // set position and x,y
 
+                            if(Options.color) {
+
+                                nodeDlgTitle.css("background", Options.color);
+                            }
+
                             nodeDlgRoot
                                 .css("position", Options.position)
                                 .css("left", Options.left)
@@ -104,7 +110,7 @@ var MODULE =
 
                             if(Options.enableMove === true) {
 
-                                Atom.UI.Plugin.enableMove(nodeDlgTitle, nodeDlgRoot);
+                                Atom.UI.Plugin.moveable(nodeDlgTitle, nodeDlgRoot);
                             }
 
                             // add event listener
@@ -142,7 +148,7 @@ var MODULE =
 
                         },
 
-                        getRootNode: function() {
+                        getNode: function() {
 
                             return nodeDlgRoot;
                         },

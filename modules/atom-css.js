@@ -35,7 +35,7 @@ var MODULE = {
 
                     color: "", fontSize: "fS", fontFamily: "fF", textAlign: "tA", lineHeight: "lH",
 
-                    position: "pos", top: "t", right: "r", bottom: "b", left: "l",
+                    position: "pos",  right: "r", bottom: "b",
 
                     margin: "m", marginTop: "mT",  marginRight: "mR", marginBottom: "mB",marginLeft: "mL",
 

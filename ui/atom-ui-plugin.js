@@ -6,13 +6,15 @@
 var MODULE =
 {
     options: {
-        pluginForSelector: ["enableMove", "enableResize", "draggable", "droppable"]
+        pluginForSelector: ["moveable", "resizeable", "draggable", "droppable", "model"]
     },
     manifest: {
         name: "ui-plugin",
         type: "ui",
 
-        exportTarget: Atom.UI.Plugin
+        exportTarget: Atom.UI.Plugin,
+
+        css: ["atom-ui-plugin.css"]
     },
     scope: {
 
@@ -22,8 +24,8 @@ var MODULE =
         entry: function($module, options) {
 
             if($_handyMode) {
-                window.move = Atom.UI.Plugin.enableMove;
-                window.resize = Atom.UI.Plugin.enableResize;
+                window.move = Atom.UI.Plugin.moveable;
+                window.resize = Atom.UI.Plugin.resizeable;
             }
 
             // export HTML API
@@ -50,7 +52,7 @@ var MODULE =
     },
     members: {
 
-        "enableMove": function(anchorNode, moveNode, userOptions) {
+        "moveable": function(anchorNode, moveNode, userOptions) {
 
             var moveController = {}, moveStatus,
                 alsoMoveAnchor = false,
@@ -90,12 +92,12 @@ var MODULE =
             };
 
             if(userOptions) {
-                $.extend(Options, userOptions);
+                $$$.extend(userOptions, Options);
             }
 
             oriNode = moveNode = moveNode || anchorNode;
             if(moveNode !== anchorNode && Options.moveAnchor) {
-                Atom.UI.Plugin.enableMove(anchorNode, null, userOptions);
+                Atom.UI.Plugin.moveable(anchorNode, null, userOptions);
             }
 
             if(Options.cssPosition) {
@@ -157,7 +159,7 @@ var MODULE =
                 }
 
                 // 禁用选择
-                $("body").addClass("disable_select");
+                $$$("body").addClass("atom-disable-select");
 
                 // check mode
                 startX = event.screenX, startY = event.screenY;
@@ -234,7 +236,7 @@ var MODULE =
 
             function onMouseup_window(event) {
 
-                $("body").removeClass("disable_select");
+                $$$("body").removeClass("atom-disable-select");
                 moveStatus = "stop";
 
                 window.removeEventListener("mousemove", onMousemove_window);
@@ -263,7 +265,7 @@ var MODULE =
             }
         },
 
-        "enableResize": function(anchorNode, resizeNode, userOptions) {
+        "resizeable": function(anchorNode, resizeNode, userOptions) {
 
             var Options =
             {
@@ -391,7 +393,7 @@ var MODULE =
 //
 //            $CORE.copy(userOptions, Options);
 //
-//            Atom.UI.Plugin.enableMove(targetNode, null, Options);
+//            Atom.UI.Plugin.moveable(targetNode, null, Options);
 
             onDragStart = $CORE.makeMethod(onDragStart);
 
@@ -464,6 +466,165 @@ var MODULE =
                     Options.onDragLeave.apply(targetNode[0], arguments);
                 }
             }
+        },
+
+        "model": function(targetNode, createOptions) {
+            var Options =
+            {
+                parent: $$$(document),
+                opacity: 0.8,
+                background: "black",
+                top: null,
+                left: null,
+
+                className: "",
+                id: "",
+                exitByClick: true,
+                exitByEscape: true
+            };
+
+            $$.extend(createOptions, Options);
+
+            var shadowClass = "atom-shadow",
+                canvasClassName = "atom-shadow-cover",
+                contentClassName = "atom-shadow-content",
+                escapeCode = 27,
+
+                nextSibling = targetNode.prev(),
+                parentElement = targetNode.parent(),
+
+                nodeShadow = createElement2("div", "", shadowClass + Options.className),
+
+                nodeShadowCover = createElement2("div", "", canvasClassName);
+
+            // get bounding rectangle
+
+            var clientRect = targetNode[0].getBoundingClientRect();
+
+            nodeShadow.append(nodeShadowCover);
+            nodeShadow.append(targetNode);
+
+            Options.parent.append(nodeShadow);
+
+            if(Options.left == null) {
+                targetNode.css("left", clientRect.left);
+            }
+            else {
+                targetNode.left(Options.left, nodeShadow);
+            }
+
+            if(Options.top == null) {
+                targetNode.css("top", clientRect.top);
+            }
+            else {
+                targetNode.top(Options.top, nodeShadow);
+            }
+
+            if(Options.exitByClick == true) {
+                nodeShadowCover.listen("click", fnOnClickShadow, false);
+            }
+
+            if(Options.exitByEscape = true) {
+                on(fnOnKeydownEscape, "keydown");
+            }
+
+
+            function fnOnClickShadow(event) {
+
+                fnExitModel();
+            }
+
+            function fnOnKeydownEscape(event) {
+
+                if(event.keyCode == escapeCode) {
+                    fnExitModel();
+                }
+            }
+
+            function fnExitModel() {
+                if(nextSibling.hasNode()) {
+                    nextSibling.before(targetNode);
+                }
+                else {
+                    parentElement.append(targetNode);
+                }
+
+                nodeShadow.remove();
+            }
+        },
+
+        "contextmenu": function(targetNode, items, varArg) {
+
+            var Options =
+            {
+                "title": "menu",
+                "onShowMenu": null,
+                "onHideMenu": null,
+                "className": "",
+                "onClick": null,
+                "onDblclick": null,
+
+                "parent": Body
+            },
+                onClickCallback, createOptions;
+
+            if(isFunction(varArg)) {
+                onClickCallback = varArg;
+            }
+            else {
+                createOptions = varArg;
+                $$.extend(createOptions, Options);
+
+                onClickCallback = Options.onClick;
+            }
+            var menuClass = "atom-menu ",
+                menuTitleClass = "atom-menu-class",
+                menuContentClass = "atom-menu-content",
+
+                nodeMenu = createElement2("div", "", menuClass + Options.className),
+                nodeMenuContent = createElement2("div", "", menuContentClass),
+                nodeMenuTitle;
+
+
+            // create menu
+
+            if(Options.title) {
+                nodeMenuTitle = createElement2("div", "", menuTitleClass);
+                nodeMenu.append(nodeMenuTitle);
+            }
+
+            for(var iItem = 0; iItem < items.length; iItem++) {
+
+                var itemText = items[iItem],
+                    itemNode = createElement2("div", itemText);
+
+                nodeMenuContent.append(itemNode);
+            }
+
+            nodeMenu.append(nodeMenuContent);
+
+
+            targetNode.listen("contextmenu", fnOnContextMenu);
+
+            // set coordinate
+
+            function fnOnContextMenu(event) {
+
+                var menuX = event.pageX,
+                    menuY = event.pageY;
+
+                Options.parent.append(nodeMenu);
+                nodeMenu.css("left", menuX).css("top",menuY);
+
+                nodeMenu.onClickBlur(fnOnClickBlur);
+            }
+
+            function fnOnClickBlur(event) {
+
+                nodeMenu.remove();
+            }
         }
+
+
     }
 };

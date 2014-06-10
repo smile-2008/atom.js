@@ -542,6 +542,7 @@ function Seed() {
         scope = MODULE.scope;
         members = MODULE.members || {};
 
+
         Class = MODULE.Class;
         keep = MODULE.keep;
 
@@ -592,6 +593,18 @@ function Seed() {
             }
         }
 
+        var classAlias = scope.classAlias;
+
+        if(classAlias) {
+
+            for(var aliasName in classAlias) {
+
+                var className = classAlias[aliasName];
+
+                Class[aliasName] = Class[className];
+            }
+        }
+
         // check handyAlias
         var handyAlias = scope.handyAlias;
 
@@ -638,6 +651,7 @@ function Seed() {
             }
         }
 
+
         // export class
         if(manifest.exportClass !== false) {
 
@@ -652,6 +666,18 @@ function Seed() {
                     exportTarget[kClass] = curClass;
                     module[kClass] = curClass;
                 }
+            }
+        }
+
+        // add Atom member
+        var atomMembers = scope.atomMembers,
+            memberName;
+        if(atomMembers) {
+
+            for(var atomName in atomMembers) {
+
+                memberName = atomMembers[atomName];
+                Atom[atomName] = module[memberName];
             }
         }
 

@@ -6,9 +6,11 @@ MODULE = {
 
     options: {
 
-        selectorSymbol: ["get", "sel", "$$$", "v"],
+        selectorSymbol: ["get", "sel", "$$$", "$$", "v"],
 
-        loadUI: true
+        loadUI: true,
+
+        holdAtom: true
     },
     manifest: {
         name: "Selector",
@@ -27,7 +29,6 @@ MODULE = {
                 HTMLEmitter = new $CORE.Emitter();
 
             if(true) {
-
                 // create apis object
 
                 $CORE.copy($ELEMENT.HTMLExtendClass, selectorAPIs);
@@ -44,17 +45,37 @@ MODULE = {
                     selectorAPIs[apiName] = $keeper.api.returnSelectorAPIs(apiMethod);
                 }
 
+                //
+                $CORE.copy($module.selectorExtendClass, selectorAPIs);
+
+                var trueSelector;
+
+                if(options.holdAtom == true) {
+
+                    // move member
+
+                    $CORE.copy(window.Atom, AtomSelector);
+
+                    window.Atom = AtomSelector;
+                    trueSelector = Atom;
+
+                }
+                else {
+                    trueSelector = $module.AtomSelector;
+                }
+
                 // add alias name
 
                 options.selectorSymbol.forEach(function(symbolName) {
 
-                    window[symbolName] = $module.AtomSelector;
+                    window[symbolName] = trueSelector;
                 });
             }
+        },
 
-//            if(! false) {
-//                $seed.loadModule("ui-basic", "ui");
-//            }
+        "onLoad": function() {
+
+            Body = $$("body");
         }
     },
 
@@ -97,6 +118,11 @@ MODULE = {
                             }
                             else {
                                 firstResult = apiResult;
+
+                                if(firstResult instanceof HTMLElement) {
+
+                                    firstResult = $$(firstResult);
+                                }
                             }
                         }
                     }
@@ -117,7 +143,6 @@ MODULE = {
             argType = typeof(selector);
 
             switch(argType) {
-
                 case "string": {
                     nodeList = document.querySelectorAll(selector);
 
@@ -127,9 +152,16 @@ MODULE = {
 
                 case "object": {
 
-                    if(selector instanceof HTMLElement) {
+                    if(selector == null) {
+                        // TODO:
+                    }
+                    else if(selector instanceof HTMLElement) {
 
                         _this.push(selector);
+                    }
+                    else if(selector == document) {
+
+                        _this.push(document.body);
                     }
                     else if($Array.isLikeArray(selector)) {
 
@@ -146,6 +178,24 @@ MODULE = {
             _this.atom = "1.0";
 
             return _this;
+        },
+
+        selectorExtendClass: {
+
+            hasNode: function(node) {
+
+                var hasResult;
+
+                if(node == null) {
+                    hasResult = (this.length > 0);
+                }
+                else {
+
+                    hasResult = (this.indexOf(node) !== -1)
+                }
+
+                return result;
+            }
         }
     }
 };

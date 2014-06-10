@@ -211,6 +211,30 @@ var MODULE = {
                             }
                         }
                     }
+                },
+
+                onClickBlur: function(blurCallback, isRepeat) {
+
+                    blurCallback = $CORE.makeMethod(blurCallback);
+
+                    Body.listen("click", fnOnClickPage, true);
+
+                    function fnOnClickPage(event) {
+
+                        var target = $$(event.target),
+
+                            parentList = target.parents();
+
+                        if(target[0] !== this &&
+                            !parentList.hasNode(this)) {
+
+                            blurCallback.apply(this, arguments);
+                        }
+
+                        if(isRepeat !== true) {
+                            Body.delListen("click", fnOnClickPage, true);
+                        }
+                    }
                 }
 
             }

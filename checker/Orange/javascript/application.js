@@ -30,7 +30,7 @@ function appMain() {
 
 function atomMain() {
 
-    dlg1 = new Dialog("Hey, Dialog 1.");
+    dlg1 = new Dialog("Hey, Dialog 1.", {"color": "green"});
 
-    dlg2 = new Dialog("Hey, Dialog 2.");
+    dlg2 = new Dialog("Hey, Dialog 2.", {"color": "yellow"});
 }
