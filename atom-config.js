@@ -83,7 +83,8 @@ AtomUIModulesMap =
     "ui-basic": "atom-ui-basic.js",
     "ui-plugin": "atom-ui-plugin.js",
 
-    "ui-dialog": "atom-ui-dialog.js"
+    "ui-dialog": "atom-ui-dialog.js",
+    "ui-screen": "atom-ui-screen.js"
 };
 
 /** @desc options map

@@ -14,3 +14,7 @@
     width: 100%;
     height: 100%;
 }
+
+.atom-shadow-target {
+    position: absolute;
+}

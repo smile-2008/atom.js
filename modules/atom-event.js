@@ -213,11 +213,13 @@ var MODULE = {
                     }
                 },
 
-                onClickBlur: function(blurCallback, isRepeat) {
+                onClickBlur: function(blurCallback, isRepeat, ignoreRightKey) {
 
+                    var targetNode = this;
                     blurCallback = $CORE.makeMethod(blurCallback);
 
-                    Body.listen("click", fnOnClickPage, true);
+
+                    Body.listen("mousedown", fnOnClickPage, true);
 
                     function fnOnClickPage(event) {
 
@@ -226,13 +228,13 @@ var MODULE = {
                             parentList = target.parents();
 
                         if(target[0] !== this &&
-                            !parentList.hasNode(this)) {
+                            !parentList.hasNode(targetNode)) {
 
-                            blurCallback.apply(this, arguments);
-                        }
+                            blurCallback.apply(targetNode, arguments);
 
-                        if(isRepeat !== true) {
-                            Body.delListen("click", fnOnClickPage, true);
+                            if(isRepeat !== true) {
+                                Body.delListen("mousedown", fnOnClickPage, true);
+                            }
                         }
                     }
                 }

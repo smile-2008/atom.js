@@ -180,6 +180,7 @@ var MODULE = {
         alias: {
             $1: "one",
             on: "bind",
+            off: "unbind"
         },
         handyAlias: {
             "be":  "makeMethod"
@@ -435,7 +436,8 @@ var MODULE = {
             return object;
         },
 
-        unbind: function(handler, object, eventType, useCapture) {
+
+        unbind: function(handler, eventType, object, useCapture) {
 
             // set default object == window if not define
             object = object || window;

@@ -703,6 +703,10 @@ function Seed() {
             scope.onInit();
         }
 
+        if(scope.onLoad) {
+
+            window.addEventListener("load", scope.onLoad);
+        }
         var dependence = manifest.dependence;
 
         if(dependence) {
@@ -722,7 +726,7 @@ function Seed() {
         var callArgs, entryResult;
 
         if(manifest.type == "ui") {
-            callArgs = [module, options,  $Selector.AtomSelector, $HTMLCreator.createElement];
+            callArgs = [module, options,  $Selector.AtomSelector, $HTMLCreator.createElement2];
         }
         else {
             callArgs = [module, options];

@@ -8,7 +8,7 @@ var MODULE = {
         name: "ui-basic",
 
         type: "ui",
-        appendence: ["ui-plugin","ui-dialog"]
+        appendence: ["ui-plugin","ui-dialog", "ui-screen"]
     },
 
     scope: {

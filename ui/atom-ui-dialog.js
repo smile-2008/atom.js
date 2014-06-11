@@ -59,7 +59,7 @@ var MODULE =
                             isShow: true,
                             isIcon: false,
 
-                            parentNode: $("body")
+                            parentNode: $$("body")
                         };
 
                     $CORE.copy(createOptions, Options);

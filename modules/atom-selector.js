@@ -92,7 +92,7 @@ MODULE = {
                     var endIndex, startIndex,
 
                         apiResult, firstResult,
-                        _node, firstArg;
+                        _node, firstArg, customArgs = arguments;
 
                     endIndex = this.length;
 
@@ -101,16 +101,16 @@ MODULE = {
                         _node = this[startIndex];
 
                         if(options.unshiftThis == true) {
-                            arguments = $Array.toArray(arguments);
+                            customArgs = $Array.toArray(arguments);
 
                             firstArg = _node;
                             if(options.addSelector == true) {
                                 firstArg = AtomSelector(_node);
                             }
-                            arguments.unshift(firstArg);
+                            customArgs.unshift(firstArg);
                         }
 
-                        apiResult = apiFunc.apply(_node, arguments);
+                        apiResult = apiFunc.apply(_node, customArgs);
 
                         if(startIndex == 0) {
                             if(apiResult == _node) {
@@ -119,7 +119,9 @@ MODULE = {
                             else {
                                 firstResult = apiResult;
 
-                                if(firstResult instanceof HTMLElement) {
+                                if(firstResult instanceof HTMLElement
+                                    || (firstResult == null)
+                                    || isLikeArray(firstResult)) {
 
                                     firstResult = $$(firstResult);
                                 }
@@ -194,7 +196,7 @@ MODULE = {
                     hasResult = (this.indexOf(node) !== -1)
                 }
 
-                return result;
+                return hasResult;
             }
         }
     }

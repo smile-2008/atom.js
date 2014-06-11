@@ -16,10 +16,15 @@ var MODULE =
 
         },
 
+        alias: {
+            execFunc: "execFunction"
+        },
         handyAlias: {
 
             "calls": "callMethods",
-            "copt": "createOptions"
+            "copt": "createOptions",
+
+            "exec": "execFunction"
         }
     },
 
@@ -85,6 +90,14 @@ var MODULE =
             $CORE.copy(userOptions, defaultOptions);
 
             return defaultOptions;
+        },
+
+        execFunction: function(code, delay) {
+
+            var execHandle;
+            execHandle = setTimeout(code, delay);
+
+            return execHandle;
         }
     }
 }

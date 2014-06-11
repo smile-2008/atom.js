@@ -6,7 +6,7 @@
 var MODULE =
 {
     options: {
-        pluginForSelector: ["moveable", "resizeable", "draggable", "droppable", "model"]
+        pluginForSelector: ["moveable", "resizeable", "draggable", "droppable", "model", "contextMenu"]
     },
     manifest: {
         name: "ui-plugin",
@@ -143,7 +143,7 @@ var MODULE =
             }
             moveNode[0]._moveControllers.push(moveController);
 
-            return moveController;
+            return anchorNode;
 
             function onMousedown_anchorNode(event) {
 
@@ -385,15 +385,15 @@ var MODULE =
 
         "draggable": function(targetNode, onDragStart, userOptions) {
 
-//            var Options =
-//            {
-//                preventDefault: false,
-//                stopPropagation: false
-//            };
-//
-//            $CORE.copy(userOptions, Options);
-//
-//            Atom.UI.Plugin.moveable(targetNode, null, Options);
+            var Options =
+            {
+                preventDefault: false,
+                stopPropagation: false
+            },
+
+                dragNodeClassName = "aui-drag-node";
+
+            $CORE.copy(userOptions, Options);
 
             onDragStart = $CORE.makeMethod(onDragStart);
 
@@ -401,13 +401,22 @@ var MODULE =
             targetNode[0].draggable = true;
 
             targetNode.listen("dragstart", fnOnDragStart);
+            targetNode.listen("dragend", fnOnDragEnd);
 
             function fnOnDragStart(event) {
+                targetNode.addClass(dragNodeClassName);
                 if(onDragStart) {
                     onDragStart.apply(targetNode[0], arguments);
                 }
             }
-            return this;
+
+            function fnOnDragEnd(evnet) {
+                if(Options.onDragEnd) {
+                    Options.onDragEnd.apply(targetNode[0], arguments);
+                }
+                targetNode.removeClass(dragNodeClassName);
+            }
+            return targetNode;
         },
 
         "droppable": function(targetNode, onDropCallback, userOptions) {
@@ -416,10 +425,16 @@ var MODULE =
             {
                 onDragOver: null,
                 onDragEnter: null,
-                onDragLeave: null
+                onDragLeave: null,
+
+                tagFilter: ""
             };
 
-            targetNode.listen("drop", fnOnDrop);
+            $$.extend(userOptions, Options);
+
+            var tagFilter = Options.tagFilter.toUpperCase();
+
+            targetNode.listen("drop", fnOnDrop, true);
             targetNode.listen("dragover", fnOnDragOver);
             targetNode.listen("dragenter", fnOnDragEnter);
 
@@ -429,32 +444,38 @@ var MODULE =
             Options.onDragLeave = $CORE.makeMethod(Options.onDragLeave);
             Options.onDragEnter = $CORE.makeMethod(Options.onDragEnter);
 
-            return this;
+            return targetNode;
 
             function fnOnDrop(event) {
 
-                event.preventDefault();
+                if(!tagFilter || tagFilter == event.target.tagName) {
+                    event.preventDefault();
 
-                if(onDropCallback) {
-                    onDropCallback.apply(targetNode[0],  arguments);
+                    if(onDropCallback) {
+                        onDropCallback.apply(targetNode[0],  arguments);
+                    }
                 }
             }
 
             function fnOnDragOver(event) {
 
-                event.preventDefault();
+                if(!tagFilter || tagFilter == event.target.tagName) {
+                    event.preventDefault();
 
-                if(Options.onDragOver) {
-                    Options.onDragOver.apply(targetNode[0], arguments);
+                    if(Options.onDragOver) {
+                        Options.onDragOver.apply(targetNode[0], arguments);
+                    }
                 }
             }
 
             function fnOnDragEnter(event) {
 
-                event.preventDefault();
+                if(!tagFilter || tagFilter == event.target.tagName) {
+                    event.preventDefault();
 
-                if(Options.onDragEnter) {
-                    Options.onDragEnter.apply(targetNode[0], arguments);
+                    if(Options.onDragEnter) {
+                        Options.onDragEnter.apply(targetNode[0], arguments);
+                    }
                 }
             }
 
@@ -487,10 +508,10 @@ var MODULE =
 
             var shadowClass = "atom-shadow",
                 canvasClassName = "atom-shadow-cover",
-                contentClassName = "atom-shadow-content",
+                targetClassName = "atom-shadow-target",
                 escapeCode = 27,
 
-                nextSibling = targetNode.prev(),
+                nextSibling = targetNode.next(),
                 parentElement = targetNode.parent(),
 
                 nodeShadow = createElement2("div", "", shadowClass + Options.className),
@@ -504,6 +525,7 @@ var MODULE =
             nodeShadow.append(nodeShadowCover);
             nodeShadow.append(targetNode);
 
+            targetNode.addClass(targetClassName);
             Options.parent.append(nodeShadow);
 
             if(Options.left == null) {
@@ -528,6 +550,7 @@ var MODULE =
                 on(fnOnKeydownEscape, "keydown");
             }
 
+            return targetNode;
 
             function fnOnClickShadow(event) {
 
@@ -550,10 +573,13 @@ var MODULE =
                 }
 
                 nodeShadow.remove();
+                targetNode.removeClass(targetClassName);
+
+                off(fnOnKeydownEscape, "keydown");
             }
         },
 
-        "contextmenu": function(targetNode, items, varArg) {
+        "contextMenu": function(targetNode, items, varArg) {
 
             var Options =
             {
@@ -564,12 +590,15 @@ var MODULE =
                 "onClick": null,
                 "onDblclick": null,
 
-                "parent": Body
+                "parent": $$(document)
             },
                 onClickCallback, createOptions;
 
             if(isFunction(varArg)) {
                 onClickCallback = varArg;
+            }
+            else if(isString(varArg)) {
+                onClickCallback = $CORE.makeMethod(varArg);
             }
             else {
                 createOptions = varArg;
@@ -585,7 +614,6 @@ var MODULE =
                 nodeMenuContent = createElement2("div", "", menuContentClass),
                 nodeMenuTitle;
 
-
             // create menu
 
             if(Options.title) {
@@ -595,16 +623,39 @@ var MODULE =
 
             for(var iItem = 0; iItem < items.length; iItem++) {
 
-                var itemText = items[iItem],
-                    itemNode = createElement2("div", itemText);
+                var item = items[iItem], itemNode, itemText;
 
+                if(isString(item)) {
+                    itemText = item;
+
+                    item  =
+                    {
+                        "caption": itemText
+                    }
+
+                    items[iItem] = item;
+                }
+                else {
+                    itemText = item.caption;
+                }
+
+                if(item.id == null) {
+                    item.id = iItem;
+                }
+
+                itemNode = createElement2("div", itemText);
+                itemNode[0]._menuIndex = iItem;
                 nodeMenuContent.append(itemNode);
             }
 
             nodeMenu.append(nodeMenuContent);
 
+            nodeMenu.listen("click", fnOnClickMenu);
+            nodeMenu.listen("dblclick", fnOnDblclickMenu);
 
             targetNode.listen("contextmenu", fnOnContextMenu);
+
+            return targetNode;
 
             // set coordinate
 
@@ -617,11 +668,69 @@ var MODULE =
                 nodeMenu.css("left", menuX).css("top",menuY);
 
                 nodeMenu.onClickBlur(fnOnClickBlur);
+
+                // call onShowMenu
+
+                if(Options.onShowMenu) {
+
+                    Options.onShowMenu.apply(nodeMenu[0], arguments);
+                }
+                event.preventDefault();
+                return false;
             }
 
             function fnOnClickBlur(event) {
 
                 nodeMenu.remove();
+
+                if(Options.onHideMenu) {
+
+                    Options.onHideMenu.apply(nodeMenu[0], arguments);
+                }
+            }
+
+            function fnOnClickMenu(event) {
+
+                var target = event.target;
+
+                if(onClickCallback) {
+                    var menuIndex = target._menuIndex,
+
+                        item = items[menuIndex],
+                        caption,
+                        customArgs;
+
+                    customArgs = [event, item, menuIndex];
+
+                    onClickCallback.apply(target, customArgs);
+                }
+            }
+
+            function fnOnDblclickMenu(event) {
+
+                var target = event.target;
+
+                if(Options.onDblclick) {
+                    var menuIndex = target._menuIndex,
+
+                        item = items[menuIndex],
+                        caption,
+                        customArgs;
+
+                    if(isString(item)) {
+
+                        caption = item;
+
+                        item =
+                        {
+                            caption: caption
+                        };
+                    }
+                    customArgs = [event, item, menuIndex];
+
+                    onClickCallback.apply(target, customArgs);
+                }
+
             }
         }
 

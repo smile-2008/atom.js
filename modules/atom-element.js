@@ -283,6 +283,11 @@ var MODULE =
                         return window.bind(handler, eventType, this,  useCapture);
                     },
 
+                    unbind: function(handler, eventType, useCapture) {
+
+                        return window.unbind(handler, eventType, this, useCapture);
+                    },
+
                     // addClass(): add a className to node's className
                     addClass: function(className) {
 
@@ -351,7 +356,7 @@ var MODULE =
 
                         elementType = typeof(element);
 
-                        if(elementType == "string") {
+                        if(elementType == "string" || elementType == "number") {
 
                             // generate element from string
                             //element = $HTMLCreator.createElementFromString(element);
@@ -555,6 +560,19 @@ var MODULE =
                         return this;
                     },
 
+                    children: function(index) {
+
+                        var childResult;
+
+                        if(index == null) {
+                            childResult = this.children;
+                        }
+                        else {
+                            childResult = this.children[index];
+                        }
+
+                        return childResult;
+                    },
                     allParents: function(tagFilter) {
 
                         var parentElement, curNode,

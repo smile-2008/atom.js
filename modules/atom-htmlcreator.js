@@ -214,23 +214,30 @@ var MODULE = {
          *  @param className the element's class name
          *  @param id the element's id
          *  @return the result element*/
-        createElement2: function(tagName, innerHTML, className, id) {
+        createElement2: function(tagName, content, className, id) {
 
             var element;
 
             // use document.createElement()
             element = document.createElement(tagName);
 
+            element = AtomSelector(element);
             // set content
-            element.innerHTML = innerHTML || "";
+            if(content != null) {
+                element.append(content);
+            }
 
             // set className
-            element.className = className || "";
+
+            if(className) {
+                element[0].className = className;
+            }
 
             // set id
-            element.id = id || "";
+            if(id) {
+                element[0].id = id;
+            }
 
-            element = AtomSelector(element);
 
             return element;
         }
