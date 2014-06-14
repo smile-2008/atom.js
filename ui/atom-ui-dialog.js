@@ -73,6 +73,7 @@ var MODULE =
 
                             _the.node = nodeDlgRoot;
 
+
                             // create title box
                             nodeDlgTitle = _("div").addClass(Options.titleClass);
 
@@ -85,6 +86,7 @@ var MODULE =
                             // create content box
 
                             nodeDlgContent = _("div").addClass(Options.contentClass).append(content);
+                            _the._nodeContent = nodeDlgContent;
 
                             nodeDlgRoot.append(nodeDlgTitle).append(nodeDlgContent);
 

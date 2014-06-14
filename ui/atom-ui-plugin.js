@@ -6,7 +6,7 @@
 var MODULE =
 {
     options: {
-        pluginForSelector: ["moveable", "resizeable", "draggable", "droppable", "model", "contextMenu"]
+        pluginForSelector: ["editable", "moveable", "resizeable", "draggable", "droppable", "model", "contextMenu"]
     },
     manifest: {
         name: "ui-plugin",
@@ -52,6 +52,64 @@ var MODULE =
     },
     members: {
 
+        "editable": function(targetNode, userOptions) {
+
+            var Options =
+            {
+                activeMode: "dblclick",
+                exitByClick: true,
+                editMode: "html"
+            },
+
+                activeMode = Options.activeMode;
+
+            targetNode.listen(activeMode, fnOnActiveNode);
+
+            function fnOnActiveNode(event) {
+
+                targetNode[0].contentEditable = true;
+
+                switch(Options.editMode) {
+
+                    case "normal":
+                    {
+
+                    }
+                        break;
+
+                    case "html":
+                    {
+                        targetNode[0].innerText = targetNode[0].innerHTML;
+                    }
+                        break;
+                }
+
+                if(Options.exitByClick == true) {
+
+                    targetNode.onClickBlur(fnOnDeactiveNode);
+                }
+            }
+
+            function fnOnDeactiveNode(event) {
+
+
+                switch(Options.editMode) {
+
+                    case "normal":
+                    {
+
+                    }
+                        break;
+
+                    case "html":
+                    {
+                        targetNode[0].innerHTML = targetNode[0].innerText;
+                    }
+                        break;
+                }
+                targetNode[0].contentEditable = "false";
+            }
+        },
         "moveable": function(anchorNode, moveNode, userOptions) {
 
             var moveController = {}, moveStatus,
@@ -381,6 +439,14 @@ var MODULE =
                     Options.onResizeEnd.call(resizeNode);
                 }
             }
+        },
+
+        "resizeable2": function(targetNode, userOptions) {
+
+            var Options =
+            {
+                anchors: ["top-left", "top", ]
+            };
         },
 
         "draggable": function(targetNode, onDragStart, userOptions) {

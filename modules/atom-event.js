@@ -219,7 +219,7 @@ var MODULE = {
                     blurCallback = $CORE.makeMethod(blurCallback);
 
 
-                    Body.listen("mousedown", fnOnClickPage, true);
+                    window.listen("mousedown", fnOnClickPage, true);
 
                     function fnOnClickPage(event) {
 
@@ -227,13 +227,13 @@ var MODULE = {
 
                             parentList = target.parents();
 
-                        if(target[0] !== this &&
+                        if(target[0] !== targetNode &&
                             !parentList.hasNode(targetNode)) {
 
                             blurCallback.apply(targetNode, arguments);
 
                             if(isRepeat !== true) {
-                                Body.delListen("mousedown", fnOnClickPage, true);
+                                window.delListen("mousedown", fnOnClickPage, true);
                             }
                         }
                     }

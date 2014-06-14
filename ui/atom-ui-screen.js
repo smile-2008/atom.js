@@ -12,7 +12,9 @@ var MODULE =
         name: "ui-screen",
         type: "ui",
 
-        complexUI: ["Screen"]
+        complexUI: ["Screen"],
+
+        css: ["atom-ui-screen.css"]
     },
     scope: {
 
