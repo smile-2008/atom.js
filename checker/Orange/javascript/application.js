@@ -30,7 +30,43 @@ function appMain() {
 
 function atomMain() {
 
-    dlg1 = new Dialog("Hey, Dialog 1.", {"color": "green"});
 
-    dlg2 = new Dialog("Hey, Dialog 2.", {"color": "yellow"});
+	// UI Dialog
+    dlg1 = new Dialog("Hey, Dialog 1.I have a block can move. and dlg3 in the screen 1 that can enter. in the end, right click your mouse", 
+    	{
+    		"color": "green",
+    		"left": 100,
+    		"top": 24,
+    		"titleText": "please dblclick me!"
+    	}
+    	);
+    dlg2 = new Dialog("Hey, Dialog 2. ", 
+    	{
+    		"color": "yellow",
+    		
+    	});
+
+    dlg3 = new Dialog();
+    dlg2.toggle(true);
+
+    // moveable Plugin
+    block = div("Drag me or dblclick me!").shape().moveable().bg("purple").dblclick("$$(this).hue16()");
+    dlg1.append(block);
+
+    // contextMenu plugin
+
+    $$("html").contextMenu(
+    	["sunny day!", "good night.", "add a square!"],
+    	function(e, item, index) {
+
+    		if(item.id == 2) {
+
+    			$$("body").append(div("").shape().moveable().bg16().xy(randInt(innerWidth - 240), randInt(innerHeight -240)));
+    		}
+    	});
+
+    	// Screen Plugin
+	screen1 = new Screen(
+		[ {holdNode: $$$(document)}, dlg3.node]
+		);
 }

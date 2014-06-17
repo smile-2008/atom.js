@@ -228,7 +228,8 @@ var MODULE = {
                             parentList = target.parents();
 
                         if(target[0] !== targetNode &&
-                            !parentList.hasNode(targetNode)) {
+                            !parentList.hasNode(targetNode)
+                            && $$(targetNode).isInDocument()) {
 
                             blurCallback.apply(targetNode, arguments);
 
