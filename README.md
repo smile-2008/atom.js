@@ -1,8 +1,8 @@
 atom
 ====
-这是我个人业余时间编写的一个Javascript函数库
+这是我个人业余时间编写的一个Javascript框架
 
-checker/ 目录有一些示例, 欢迎指正
+checker/ 目录有一些示例
 
 2015.3 更新Readme
 
@@ -12,12 +12,3 @@ Checker/Blue.html 有模块示例
 Checker/Orange.html 展示了Atom的用户组件,包括拖动功能,对话框的实现,分屏显示, 右键上下文菜单...
 其中多数通过简短的代码创建
 
-
-// 代码示例
-
-onAtom(callback) 
-
-当全部模块加载完毕后,callback会调用
-
-代码将持续更新
-联系QQ: 1131944090
