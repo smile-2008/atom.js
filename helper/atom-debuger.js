@@ -19,7 +19,10 @@ function AtomDebuger(options) {
 
     /** @step addLisener */
 
-    window.addEventListener("load", onload_CreateUI);
+    // window.addEventListener("load", );
+
+    if (SeedConfig.debugMode)
+    onload_CreateUI()
     /**
      *
      * @param string a string show in browser

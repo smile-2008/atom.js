@@ -141,7 +141,7 @@ var MODULE =
                 useMarginTop: false,
                 useMarginLeft: false,
                 counter: 0,
-                skipCounter: 6,
+                skipCounter: 1,
                 cssPosition: "",
                 cssZIndex: 1000,
 

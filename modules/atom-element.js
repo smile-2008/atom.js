@@ -841,6 +841,7 @@ var MODULE =
                         {
                             var descSets = arg1;
 
+
                             var curSet;
                             var nameArray, defValues;
                             // split object
@@ -865,12 +866,15 @@ var MODULE =
 
                                 // push html api'name
                                 $keeper.list.HTMLAPISet.push(apiName);
+
+
                             }
                         }
                             break;
                     }
 
                     $CORE.copy(HTMLAPIs, $keeper.list.HTMLAPIFuncs);
+                    $CORE.copy(HTMLAPIs, HTMLElement.prototype);
 
                     if(addToPrototype == true) {
                         $CORE.copy(HTMLElement.prototype, AtomSelector.api);
